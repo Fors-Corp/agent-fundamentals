@@ -180,6 +180,12 @@ function renderPage(L, doc, { absolute }) {
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="author" content="${esc(AUTHOR.name)}">
 <link rel="author" href="${AUTHOR.site}">
+<link rel="icon" href="${absolute ? SITE_URL : ""}/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="${absolute ? SITE_URL : ""}/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="${absolute ? SITE_URL : ""}/apple-touch-icon.png">
+<link rel="manifest" href="${absolute ? SITE_URL : ""}/manifest.webmanifest">
+<meta name="theme-color" content="#f5f7f6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1514" media="(prefers-color-scheme: dark)">
 <link rel="canonical" href="${SITE_URL}/${L.dir ? L.dir + "/" : ""}">
 ${alternates}
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -632,6 +638,29 @@ for (const L of LANGS) {
   copyFileSync(L.code === "en" ? SRC_EN : join(here, "i18n", `${L.code}.md`), join(SITE_DIR, L.code === "en" ? "claude-agent-fundamentals.md" : `${L.code}.md`));
   pages++;
 }
+// Icons: the SVG is the favicon, the PNGs serve iOS and Android; assets/ is committed (see scripts/make-icons.sh).
+const ICONS = { "icon.svg": "favicon.svg", "favicon-32.png": "favicon-32.png", "apple-touch-icon.png": "apple-touch-icon.png", "icon-192.png": "icon-192.png", "icon-512.png": "icon-512.png" };
+for (const [from, to] of Object.entries(ICONS)) {
+  const p = join(here, "assets", from);
+  if (!existsSync(p)) throw new Error(`missing icon asset: assets/${from} (run scripts/make-icons.sh)`);
+  copyFileSync(p, join(SITE_DIR, to));
+}
+writeFileSync(join(SITE_DIR, "manifest.webmanifest"), JSON.stringify({
+  name: "Agent Fundamentals",
+  short_name: "Agent Fundamentals",
+  description: "A tiered checklist for working professionally with Claude and coding agents.",
+  start_url: "/",
+  scope: "/",
+  display: "standalone",
+  background_color: "#f5f7f6",
+  theme_color: "#0d7a65",
+  icons: [
+    { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+    { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+    { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+  ],
+}, null, 2) + "\n");
+
 // English fragment for the claude.ai artifact (language links point at the public site).
 writeFileSync(join(here, "claude-agent-fundamentals.html"), renderPage(LANGS[0], enDoc, { absolute: true }));
 

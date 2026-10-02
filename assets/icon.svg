@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Agent Fundamentals">
+  <rect width="64" height="64" rx="14" fill="#0d7a65"/>
+  <g fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13.5 13.5l4 4 8.5-8"/>
+    <path d="M34 13.5h17"/>
+    <path d="M13.5 30.5l4 4 8.5-8"/>
+    <path d="M34 30.5h17"/>
+    <rect x="13.5" y="41.5" width="12" height="12" rx="3" stroke-width="3"/>
+    <path d="M34 47.5h17" opacity="0.55"/>
+  </g>
+</svg>

@@ -21,5 +21,5 @@ Static, multilingual checklist site generated from Markdown. No runtime dependen
 - Item ids are hashed from the English lead; rewording a lead resets readers' ticks for that item, so reword deliberately.
 - Interface strings live in the `UI` table in `build.mjs`; add every new key to all seven languages.
 - Never commit secrets or `.env*`; the site has none and needs none.
-- Versioning is Semantic Versioning. Bump `version` in `package.json` (patch: fixes and wording; minor: new content, sections or languages; major: breaking changes to the Markdown format or build), add a CHANGELOG.md entry, and tag `v<version>` on release. The footer shows the version.
+- Versioning is Semantic Versioning. Bump `version` in `package.json` (patch: fixes and wording; minor: new compatible additions such as content, sections, languages or assets; major: breaking changes to the Markdown format or build), add a CHANGELOG.md entry, and tag `v<version>` on release. The footer shows the version.
 - Report results with the command run and its output, not a summary.
