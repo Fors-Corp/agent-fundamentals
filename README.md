@@ -18,6 +18,7 @@ The Markdown is the source of truth; the site is generated from it with no depen
 | `check-translation.mjs` | Fails when a translation's structure, code spans or markers drift from the English source |
 | `build.mjs` | Renders one static page per language into `agent-fundamentals/` (ignored by git; Vercel builds it) |
 | `vercel.json` | Build command and output directory for Vercel |
+| `assets/` | Icon sources (`icon.svg` rounded for browsers, `icon-square.svg` full-bleed for app icons) and the committed PNGs; `scripts/make-icons.sh` regenerates the PNGs on macOS |
 
 Code fences may carry a file name after the language (```` ```json .claude/settings.json ````); they render as editor panes with line numbers, a copy button and syntax highlighting.
 
