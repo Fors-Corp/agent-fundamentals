@@ -1,6 +1,6 @@
 {
   "name": "agent-fundamentals",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "description": "A tiered checklist for working professionally with Claude and coding agents, in seven languages.",

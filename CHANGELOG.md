@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/): patch for fixes and wording, minor for new checklist content, sections or languages, major for changes that break how the Markdown or the build is used.
 
+## [1.1.0] - 2026-10-02
+
+### Added
+- App icon: a checklist mark (two ticked rows, one open box) as `favicon.svg`, a 32px PNG favicon, an Apple touch icon and 192/512px icons.
+- Web app manifest and light/dark `theme-color`, so the site can be installed and the browser chrome matches the page.
+- `scripts/make-icons.sh` regenerates the PNGs from `assets/icon-square.svg`; the PNGs are committed, so builds never need it.
+
 ## [1.0.0] - 2026-10-02
 
 ### Added
@@ -12,4 +19,5 @@ All notable changes to this project are documented here. The format follows [Kee
 - Translation structure checker (`check-translation.mjs`) used as the build gate and in CI.
 - Claude Code project configuration: CLAUDE.md, permissions and guard hooks, translator and reviewer agents, translate and release skills, graft index.
 
+[1.1.0]: https://github.com/Fors-Corp/agent-fundamentals/releases/tag/v1.1.0
 [1.0.0]: https://github.com/Fors-Corp/agent-fundamentals/releases/tag/v1.0.0
