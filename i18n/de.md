@@ -33,6 +33,7 @@ Die Gewohnheiten, auf die es ab der ersten Sitzung ankommt. Keine davon erforder
 - [ ] **Prüfen Sie, ob die ganze Aufgabe erledigt wurde, nicht nur die leichten Teile.** Vergleichen Sie mit Ihren Abnahmekriterien. Agenten verengen den Scope manchmal stillschweigend und melden trotzdem Vollzug.
 - [ ] **Achten Sie auf erfundene APIs und veraltetes Wissen.** Modellwissen hat einen Stichtag. Prüfen Sie Bibliotheksversionen, Flags und Signaturen gegen die Dokumentation oder das installierte Paket.
 - [ ] **Committen Sie in kleinen Schritten.** Git ist Ihr Rückgängig. Committen Sie nach jedem verifizierten Schritt, damit sich ein späterer Fehlschritt einzeln zurücknehmen lässt.
+- [ ] **Versionieren Sie Releases mit Semantic Versioning.** Taggen Sie jedes Release mit `MAJOR.MINOR.PATCH`: Patch für Fixes, Minor für kompatible Erweiterungen, Major für Breaking Changes, und führen Sie ein nach Versionen gegliedertes Changelog. Teammitglieder, CI und Agenten können dann allein an der Nummer erkennen, ob ein Upgrade sicher ist, und das Changelog liefert dem Modell Kontext, den ein Diff nicht bietet.
 - [ ] **Fordern Sie die Liste „Was ich nicht getan habe“ an.** Ein guter Agent meldet, was er ausgelassen hat und warum. Steht das nicht im Bericht, fragen Sie nach.
 
 ### Sicherheits-Basics
@@ -82,7 +83,7 @@ Die Umgebung so gestalten, dass Sie sich nicht mehr wiederholen und der Agent ke
 
 ### Modell und Effort
 
-- [ ] **Kennen Sie das Modellangebot und die Preise.** Siehe die Modelltabelle im API-Abschnitt. Preisverhältnisse bestimmen das Routing: Das Top-Modell kostet pro Ausgabe-Token das Zehnfache von Sonnet.
+- [ ] **Kennen Sie das Modellangebot und die Preise.** Siehe die Modelltabelle im API-Abschnitt. Preisverhältnisse bestimmen das Routing: Das Top-Modell kostet pro Ausgabe-Token das Fünffache von Sonnet.
 - [ ] **Drehen Sie am Effort, bevor Sie das Modell wechseln.** Der Effort (`low` bis `max`) tauscht Gründlichkeit gegen Tokens innerhalb eines Modells. `xhigh` ist der Standard von Claude Code für Coding; `low` passt zu mechanischer Arbeit und den meisten Subagenten.
 - [ ] **Starker Orchestrator, günstige Hände.** Die Sitzung, die die Aufgabe hält und Urteile fällt, läuft auf dem Top-Modell; die Agenten für abgegrenzte Arbeit laufen günstiger.
 - [ ] **Der Fast-Modus ist dasselbe Modell mit Aufpreis.** `/fast` erhöht die Ausgabegeschwindigkeit, nicht die Leistungsfähigkeit. Nutzen Sie ihn für interaktive Sitzungen, in denen Latenz stört, nicht für Batch-Arbeit.

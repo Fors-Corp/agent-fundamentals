@@ -33,6 +33,7 @@ The habits that matter from the first session. None of them need configuration.
 - [ ] **Check that it did the whole task, not the easy parts.** Compare against your acceptance criteria. Agents sometimes narrow scope silently and report completion.
 - [ ] **Look for invented APIs and stale knowledge.** Model knowledge has a cutoff. Verify library versions, flags, and signatures against the docs or the installed package.
 - [ ] **Commit in small steps.** Git is your undo. Commit after each verified increment so a bad later step can be reverted on its own.
+- [ ] **Version releases with Semantic Versioning.** Tag every release `MAJOR.MINOR.PATCH`: patch for fixes, minor for compatible additions, major for breaking changes, and keep a changelog keyed by version. Teammates, CI, and agents can then tell from the number alone whether an upgrade is safe, and the changelog gives the model context a diff does not.
 - [ ] **Ask for the "what I did not do" list.** A good agent reports what it skipped and why. If the report does not say, ask.
 
 ### Safety basics
@@ -82,7 +83,7 @@ Shaping the environment so you stop repeating yourself and the agent stops repea
 
 ### Model and effort
 
-- [ ] **Know the lineup and the prices.** See the model table in the API section. Price ratios drive routing: the top model costs ten times Sonnet per output token.
+- [ ] **Know the lineup and the prices.** See the model table in the API section. Price ratios drive routing: the top model costs five times Sonnet per output token.
 - [ ] **Turn effort before switching models.** Effort (`low` to `max`) trades thoroughness for tokens within one model. `xhigh` is the Claude Code default for coding; `low` suits mechanical work and most subagents.
 - [ ] **Strong orchestrator, cheap hands.** The session that holds the task and makes judgment calls runs on the top model; the agents that do bounded work run cheaper.
 - [ ] **Fast mode is the same model at a premium.** `/fast` raises output speed, not capability. Use it for interactive sessions where latency hurts, not for batch work.

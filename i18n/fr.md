@@ -33,6 +33,7 @@ Les habitudes qui comptent dès la première session. Aucune ne demande de confi
 - [ ] **Vérifiez qu'il a fait toute la tâche, pas seulement les parties faciles.** Comparez avec vos critères d'acceptation. Les agents réduisent parfois le périmètre sans le dire et annoncent avoir terminé.
 - [ ] **Traquez les API inventées et les connaissances périmées.** Les connaissances du modèle ont une date limite. Vérifiez les versions de bibliothèques, les options et les signatures dans la documentation ou dans le paquet installé.
 - [ ] **Faites des commits par petites étapes.** Git est votre bouton d'annulation. Committez après chaque incrément vérifié, pour qu'une mauvaise étape ultérieure puisse être annulée seule.
+- [ ] **Versionnez vos releases avec le Semantic Versioning (gestion sémantique de version).** Taguez chaque release `MAJOR.MINOR.PATCH` : patch pour les correctifs, minor pour les ajouts compatibles, major pour les changements incompatibles, et tenez un changelog organisé par version. Coéquipiers, CI et agents peuvent alors savoir, rien qu'au numéro, si une mise à jour est sûre, et le changelog donne au modèle un contexte qu'un diff ne fournit pas.
 - [ ] **Demandez la liste de « ce que je n'ai pas fait ».** Un bon agent indique ce qu'il a laissé de côté et pourquoi. Si son compte rendu ne le dit pas, demandez-le.
 
 ### Sécurité de base
@@ -82,7 +83,7 @@ Façonner l'environnement pour que vous cessiez de vous répéter et que l'agent
 
 ### Modèle et effort
 
-- [ ] **Connaissez la gamme et les prix.** Voir le tableau des modèles dans la section API. Ce sont les rapports de prix qui dictent le routage : le modèle le plus puissant coûte dix fois Sonnet par token de sortie.
+- [ ] **Connaissez la gamme et les prix.** Voir le tableau des modèles dans la section API. Ce sont les rapports de prix qui dictent le routage : le modèle le plus puissant coûte cinq fois Sonnet par token de sortie.
 - [ ] **Ajustez l'effort avant de changer de modèle.** L'effort (de `low` à `max`) échange de la rigueur contre des tokens au sein d'un même modèle. `xhigh` est la valeur par défaut de Claude Code pour le code ; `low` convient au travail mécanique et à la plupart des sous-agents.
 - [ ] **Un orchestrateur solide, des exécutants économiques.** La session qui détient la tâche et tranche tourne sur le modèle le plus puissant ; les agents qui font le travail borné tournent sur des modèles moins chers.
 - [ ] **Le mode rapide, c'est le même modèle avec une surcharge.** `/fast` augmente la vitesse de sortie, pas la capacité. Utilisez-le pour les sessions interactives où la latence gêne, pas pour le travail par lots.
