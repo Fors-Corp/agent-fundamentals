@@ -1,5 +1,7 @@
 # Agent Fundamentals
 
+[![Support · 1,99 €](https://img.shields.io/badge/Support-1%2C99_%E2%82%AC-2f855a)](https://marcfors.com/donate?from=agent-fundamentals)
+
 A tiered checklist for working professionally with Claude and coding agents: basics, intermediate and pro habits, token economy with and without [graft](https://www.npmjs.com/package/@nanonets/graft), model routing, Claude API habits, worked examples, and the house rules this team works by.
 
 **Live:** https://agent-fundamentals.vercel.app (English), also in [Español](https://agent-fundamentals.vercel.app/es/), [Català](https://agent-fundamentals.vercel.app/ca/), [Français](https://agent-fundamentals.vercel.app/fr/), [Português](https://agent-fundamentals.vercel.app/pt/), [Italiano](https://agent-fundamentals.vercel.app/it/) and [Deutsch](https://agent-fundamentals.vercel.app/de/).
@@ -51,3 +53,5 @@ Releases follow [Semantic Versioning](https://semver.org/) and are tagged `vMAJO
 ## Licence
 
 [MIT](LICENSE) © 2026 Marc Fors
+
+If this project is useful to you, you can [support it with 1,99 €](https://marcfors.com/donate?from=agent-fundamentals).

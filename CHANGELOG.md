@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/): patch for fixes and wording, minor for new checklist content, sections or languages, major for changes that break how the Markdown or the build is used.
 
+## [Unreleased]
+
+### Added
+- Support · 1,99 € link in the page footer (translated in all seven languages) and a README badge.
+
 ## [1.1.0] - 2026-10-02
 
 ### Added
