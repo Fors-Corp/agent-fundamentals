@@ -1,0 +1,16 @@
+{
+  "name": "agent-fundamentals",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A tiered checklist for working professionally with Claude and coding agents, in seven languages.",
+  "author": "Marc Fors <developer@marcfors.com> (https://marcfors.com)",
+  "license": "MIT",
+  "repository": "github:Fors-Corp/agent-fundamentals",
+  "homepage": "https://agent-fundamentals.vercel.app",
+  "scripts": {
+    "check": "for l in es ca fr pt it de; do node check-translation.mjs $l || exit 1; done",
+    "build": "node build.mjs"
+  },
+  "engines": { "node": ">=24" }
+}
