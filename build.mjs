@@ -10,6 +10,7 @@
 // from the English source fails the build (run `node check-translation.mjs <lang>`).
 
 import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync } from "node:fs";
+import { execSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseMarkdown, compare } from "./lib/md.mjs";
@@ -19,6 +20,7 @@ const SRC_EN = join(here, "claude-agent-fundamentals.md");
 const SITE_DIR = join(here, "agent-fundamentals");
 const SITE_URL = "https://agent-fundamentals.vercel.app";
 const REPO_URL = "https://github.com/Fors-Corp/agent-fundamentals";
+const VERSION = JSON.parse(readFileSync(join(here, "package.json"), "utf8")).version; // SemVer, shown in the footer
 const AUTHOR = { name: "Marc Fors", github: "https://github.com/marcfs31", linkedin: "https://www.linkedin.com/in/marc-fors", site: "https://marcfors.com" };
 
 // Language list: code, native name, URL directory ("" = site root).
@@ -61,7 +63,7 @@ function inline(src, ui) {
   s = esc(s);
   s = s.replace(/\(House rule\)/g, `<span class="tag">${esc(ui.houseRule)}</span>`);
   s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-  s = s.replace(/(^|[^\w"=])(https?:\/\/[^\s<]+[^\s<.,)])/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+  s = s.replace(/(^|[^\w"=>])(https?:\/\/[^\s<]+[^\s<.,)])/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>'); // ">" excluded: never autolink inside a link just made
   s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   s = s.replace(/(^|[\s(])\*([^*\s][^*]*?)\*(?=[\s.,;:)]|$)/g, "$1<em>$2</em>");
   return s.replace(/\u0000(\d+)\u0000/g, (_, i) => codes[+i]);
@@ -69,6 +71,9 @@ function inline(src, ui) {
 
 // ---------- load documents ----------
 const enDoc = parseMarkdown(readFileSync(SRC_EN, "utf8"));
+if (enDoc.intro.some((b) => b.type === "list" && b.items.some((it) => it.check))) {
+  throw new Error("checklist items are not allowed before the first '## ' heading: they would have no section and no id");
+}
 
 // English ids, positional per section, so every language maps item k of section s to the same id.
 const enSlugs = enDoc.sections.map((s) => slug(s.title));
@@ -101,7 +106,7 @@ for (const L of LANGS) {
 // ---------- render ----------
 function renderBlock(b, ui, ctx) {
   switch (b.type) {
-    case "h3": return `<h3 id="${slug(b.text)}">${inline(b.text, ui)}</h3>`;
+    case "h3": return `<h3 id="${ctx.sec}-${slug(b.text)}">${inline(b.text, ui)}</h3>`; // scoped: several sections repeat a subheading
     case "p": return `<p>${inline(b.text, ui)}</p>`;
     case "quote": return `<blockquote>${inline(b.text, ui)}</blockquote>`;
     case "code": {
@@ -111,7 +116,7 @@ function renderBlock(b, ui, ctx) {
       const gutter = lines.map((_, i) => i + 1).join("\n");
       const label = b.file ? esc(b.file) : (lang === "text" ? "" : esc(lang));
       const hl = lang === "text" ? "plaintext" : esc(lang);
-      return `<figure class="editor" data-lang="${esc(lang)}"><figcaption class="editor-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="editor-title">${label}</span><button type="button" class="copy" data-copy data-copied="${esc(ui.copied)}">${esc(ui.copy)}</button></figcaption><div class="editor-body"><pre class="gutter" aria-hidden="true">${gutter}</pre><pre tabindex="0"><code class="language-${hl}">${esc(b.text)}</code></pre></div></figure>`;
+      return `<figure class="editor" data-lang="${esc(lang)}"><figcaption class="editor-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="editor-title">${label}</span><button type="button" class="copy" data-copy data-copied="${esc(ui.copied)}">${esc(ui.copy)}</button></figcaption><div class="editor-body"><pre class="gutter" aria-hidden="true">${gutter}</pre><pre tabindex="0" role="region" aria-label="${label || esc(lang)}"><code class="language-${hl}">${esc(b.text)}</code></pre></div></figure>`;
     }
     case "table": {
       const th = b.head.map((c) => `<th>${inline(c, ui)}</th>`).join("");
@@ -134,7 +139,9 @@ function renderBlock(b, ui, ctx) {
   }
 }
 
-const built = new Date().toISOString().slice(0, 10);
+// Footer date: the last commit's date when building from git (reproducible), today otherwise.
+let built = new Date().toISOString().slice(0, 10);
+try { built = execSync("git log -1 --format=%cs", { cwd: here, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim() || built; } catch {}
 
 /** Render one language. `absolute` makes language links point at the public site (for the artifact fragment). */
 function renderPage(L, doc, { absolute }) {
@@ -145,7 +152,7 @@ function renderPage(L, doc, { absolute }) {
   ).join("\n");
 
   const body = doc.sections.map((s, si) => {
-    const ctx = { ids: enIds[si], k: 0 };
+    const ctx = { ids: enIds[si], k: 0, sec: sectionIds[si] };
     return `
 <section id="${sectionIds[si]}" data-items="${s.items}">
   <header class="sec-head">
@@ -163,7 +170,7 @@ function renderPage(L, doc, { absolute }) {
   const alternates = LANGS.map((X) => `<link rel="alternate" hreflang="${X.code}" href="${SITE_URL}/${X.dir ? X.dir + "/" : ""}">`).join("\n") +
     `\n<link rel="alternate" hreflang="x-default" href="${SITE_URL}/">`;
 
-  const introHtml = doc.intro.map((b) => renderBlock(b, ui, { ids: [], k: 0 })).join("\n");
+  const introHtml = doc.intro.map((b) => renderBlock(b, ui, { ids: [], k: 0, sec: "intro" })).join("\n");
   const description = doc.intro.length && doc.intro[0].type === "p" ? doc.intro[0].text.replace(/[`*]/g, "").slice(0, 300) : "";
   const mdName = L.code === "en" ? "claude-agent-fundamentals.md" : `${L.code}.md`;
 
@@ -217,10 +224,10 @@ ${body}
 <footer>
   <p class="credit">${esc(ui.builtBy)} <a href="${AUTHOR.site}" target="_blank" rel="noopener author">${esc(AUTHOR.name)}</a>
     <span class="credit-links"><a href="${AUTHOR.github}" target="_blank" rel="noopener">GitHub</a> · <a href="${AUTHOR.linkedin}" target="_blank" rel="noopener">LinkedIn</a> · <a href="${AUTHOR.site}" target="_blank" rel="noopener">marcfors.com</a> · <a href="${REPO_URL}" target="_blank" rel="noopener">${esc(ui.source)}</a></span></p>
-  <p>${esc(ui.generatedFrom)} <a href="${absolute ? SITE_URL + "/" : "/"}${mdName}">${mdName}</a> ${esc(ui.on)} ${built}. ${esc(ui.rebuild)} <code>node build.mjs</code>. MIT.</p>
+  <p>${esc(ui.generatedFrom)} <a href="${absolute ? SITE_URL + "/" : "/"}${mdName}">${mdName}</a> ${esc(ui.on)} ${built}. ${esc(ui.rebuild)} <code>node build.mjs</code>. <a href="${REPO_URL}/blob/main/CHANGELOG.md" target="_blank" rel="noopener">v${esc(VERSION)}</a> · MIT.</p>
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js" integrity="sha384-RH2xi4eIQ/gjtbs9fUXM68sLSi99C7ZWBRX1vDrVv6GQXRibxXLbwO2NGZB74MbU" crossorigin="anonymous"></script>
 <script>
 window.AF_UI = ${JSON.stringify(ui)};
 ${JS}
@@ -232,10 +239,10 @@ ${JS}
 const CSS = `
 /* Layout: a left rail of sections with per-section progress, a reading column of ~72ch, a sticky two-row header: identity, meter, language and theme on the first row; list tools on the second. Phone: the rail becomes a chip row. */
 :root {
-  --bg: #f5f7f6; --surface: #ffffff; --fg: #16201e; --muted: #5d6c69; --line: #d6dedb;
+  --bg: #f5f7f6; --surface: #ffffff; --fg: #16201e; --muted: #54625f; --line: #d6dedb;
   --accent: #0d7a65; --accent-ink: #ffffff; --accent-soft: #dcefe9;
-  --mark: #b8731a; --mark-soft: #f7e9d3; --code-bg: #eaefed;
-  --editor-bg: #f0f3f1; --editor-bar: #e2e8e5; --gutter: #8a9894;
+  --mark: #8f5612; --mark-soft: #f7e9d3; --code-bg: #eaefed;
+  --editor-bg: #f0f3f1; --editor-bar: #e2e8e5; --gutter: #5d6c69;
   --c-key: #7a3e9d; --c-str: #0b6e4f; --c-num: #a35200; --c-cmt: #66746f; --c-fn: #1554a8; --c-attr: #8a3b12;
   --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
@@ -292,8 +299,12 @@ main:focus { outline: none; }
 
 @media (prefers-contrast: more) {
   :root { --line: #8a9894; --muted: #3f4b48; }
+  :root[data-theme="dark"] { --line: #5d6c69; --muted: #c3cfcb; }
   .box { border-width: 2px; }
   .rail a.active { border-left-width: 3px; }
+}
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --line: #5d6c69; --muted: #c3cfcb; }
 }
 a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
 code, pre { font-family: var(--font-mono); font-size: 0.86em; }
@@ -590,8 +601,21 @@ const JS = String.raw`
 `;
 
 // ---------- write outputs ----------
+const BODY_START = '<a class="skip"'; // first body element of the fragment; everything before it belongs in <head>
 const wrap = (L, fragment) =>
-  `<!doctype html>\n<html lang="${L.code}">\n<head>\n<meta charset="utf-8">\n${fragment.slice(0, fragment.indexOf('<div class="topbar">'))}</head>\n<body>\n${fragment.slice(fragment.indexOf('<div class="topbar">'))}</body>\n</html>\n`;
+  `<!doctype html>\n<html lang="${L.code}">\n<head>\n<meta charset="utf-8">\n${fragment.slice(0, fragment.indexOf(BODY_START))}</head>\n<body>\n${fragment.slice(fragment.indexOf(BODY_START))}</body>\n</html>\n`;
+
+/** Build-time self-check of a rendered page; throws on defects a browser would hide. */
+function selfCheck(name, html) {
+  const ids = [...html.matchAll(/ id="([^"]+)"/g)].map((m) => m[1]);
+  const dup = ids.filter((x, i) => ids.indexOf(x) !== i);
+  const problems = [];
+  if (dup.length) problems.push(`duplicate ids: ${[...new Set(dup)].join(", ")}`);
+  if (/data-id="undefined"/.test(html)) problems.push("checklist item without an id");
+  if (/<a [^>]*>[^<]*<a /.test(html)) problems.push("nested links");
+  if (html.indexOf(BODY_START) < 0) problems.push("skip link missing");
+  if (problems.length) throw new Error(`${name}: ${problems.join("; ")}`);
+}
 
 mkdirSync(SITE_DIR, { recursive: true });
 let pages = 0;
@@ -601,7 +625,9 @@ for (const L of LANGS) {
   const fragment = renderPage(L, doc, { absolute: false });
   const outDir = L.dir ? join(SITE_DIR, L.dir) : SITE_DIR;
   mkdirSync(outDir, { recursive: true });
-  writeFileSync(join(outDir, "index.html"), wrap(L, fragment));
+  const page = wrap(L, fragment);
+  selfCheck(`${L.code}/index.html`, page);
+  writeFileSync(join(outDir, "index.html"), page);
   copyFileSync(L.code === "en" ? SRC_EN : join(here, "i18n", `${L.code}.md`), join(SITE_DIR, L.code === "en" ? "claude-agent-fundamentals.md" : `${L.code}.md`));
   pages++;
 }

@@ -33,6 +33,7 @@ Le abitudini che contano fin dalla prima sessione. Nessuna richiede configurazio
 - [ ] **Verifica che abbia svolto l'intero compito, non solo le parti facili.** Confronta con i tuoi criteri di accettazione. A volte gli agenti restringono l'ambito in silenzio e dichiarano di aver finito.
 - [ ] **Cerca API inventate e conoscenze obsolete.** La conoscenza del modello ha una data limite. Verifica versioni delle librerie, flag e firme sulla documentazione o sul pacchetto installato.
 - [ ] **Fai commit a piccoli passi.** Git è il tuo annulla. Fai commit dopo ogni incremento verificato, così un passo successivo errato si può ripristinare da solo.
+- [ ] **Versiona le release con il Semantic Versioning.** Etichetta ogni release con un tag `MAJOR.MINOR.PATCH`: patch per le correzioni, minor per le aggiunte compatibili, major per le modifiche incompatibili, e tieni un changelog organizzato per versione. Colleghi, CI e agenti possono così capire dal solo numero se un aggiornamento è sicuro, e il changelog dà al modello un contesto che un diff non offre.
 - [ ] **Chiedi la lista di "cosa non ho fatto".** Un buon agente riporta ciò che ha saltato e perché. Se il resoconto non lo dice, chiedilo.
 
 ### Nozioni di base sulla sicurezza
@@ -82,7 +83,7 @@ Plasmare l'ambiente in modo che tu smetta di ripeterti e l'agente smetta di ripe
 
 ### Modello ed effort
 
-- [ ] **Conosci la gamma e i prezzi.** Vedi la tabella dei modelli nella sezione API. Sono i rapporti di prezzo a guidare l'instradamento: il modello di punta costa dieci volte Sonnet per token di output.
+- [ ] **Conosci la gamma e i prezzi.** Vedi la tabella dei modelli nella sezione API. Sono i rapporti di prezzo a guidare l'instradamento: il modello di punta costa cinque volte Sonnet per token di output.
 - [ ] **Regola l'effort prima di cambiare modello.** L'effort (da `low` a `max`) scambia accuratezza con token all'interno di uno stesso modello. `xhigh` è il default di Claude Code per il coding; `low` si adatta al lavoro meccanico e alla maggior parte dei subagent.
 - [ ] **Orchestratore forte, braccia economiche.** La sessione che tiene il compito e prende le decisioni di giudizio gira sul modello di punta; gli agenti che svolgono lavoro circoscritto girano su modelli più economici.
 - [ ] **La modalità fast è lo stesso modello a un prezzo maggiorato.** `/fast` aumenta la velocità di output, non la capacità. Usala per le sessioni interattive in cui la latenza pesa, non per il lavoro batch.

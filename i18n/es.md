@@ -33,6 +33,7 @@ Los hábitos que importan desde la primera sesión. Ninguno requiere configuraci
 - [ ] **Comprobar que hizo la tarea completa, no solo las partes fáciles.** Compararla con los criterios de aceptación. A veces los agentes reducen el alcance en silencio y comunican que han terminado.
 - [ ] **Buscar APIs inventadas y conocimiento obsoleto.** El conocimiento del modelo tiene una fecha de corte. Verificar versiones de bibliotecas, flags y firmas con la documentación o el paquete instalado.
 - [ ] **Confirmar cambios (commit) en pasos pequeños.** Git es el mecanismo para deshacer. Hacer commit tras cada incremento verificado, de modo que un paso posterior defectuoso pueda revertirse por separado.
+- [ ] **Versionar las publicaciones con Semantic Versioning (versionado semántico).** Etiquetar cada versión como `MAJOR.MINOR.PATCH`: patch para correcciones, minor para adiciones compatibles, major para cambios incompatibles, y mantener un changelog organizado por versión. Así, el equipo, el CI y los agentes pueden saber solo por el número si una actualización es segura, y el changelog da al modelo un contexto que un diff no ofrece.
 - [ ] **Pedir la lista de «lo que no hice».** Un buen agente informa de lo que omitió y por qué. Si el informe no lo dice, preguntar.
 
 ### Seguridad básica
@@ -82,7 +83,7 @@ Dar forma al entorno para dejar de repetirse y para que el agente deje de repeti
 
 ### Modelo y esfuerzo
 
-- [ ] **Conocer la gama y los precios.** Consultar la tabla de modelos en la sección de la API. Las proporciones de precio determinan el enrutado: el modelo superior cuesta diez veces más que Sonnet por token de salida.
+- [ ] **Conocer la gama y los precios.** Consultar la tabla de modelos en la sección de la API. Las proporciones de precio determinan el enrutado: el modelo superior cuesta cinco veces más que Sonnet por token de salida.
 - [ ] **Ajustar el esfuerzo antes de cambiar de modelo.** El esfuerzo (de `low` a `max`) intercambia exhaustividad por tokens dentro de un mismo modelo. `xhigh` es el valor por defecto de Claude Code para programar; `low` es adecuado para trabajo mecánico y para la mayoría de los subagentes.
 - [ ] **Orquestador potente, manos baratas.** La sesión que sostiene la tarea y toma las decisiones de criterio se ejecuta en el modelo superior; los agentes que hacen trabajo acotado se ejecutan en modelos más baratos.
 - [ ] **El modo rápido es el mismo modelo con recargo.** `/fast` aumenta la velocidad de salida, no la capacidad. Usarlo en sesiones interactivas en las que la latencia perjudica, no en trabajo por lotes.

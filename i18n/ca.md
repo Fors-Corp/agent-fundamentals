@@ -33,6 +33,7 @@ Els hàbits que compten des de la primera sessió. Cap no requereix configuraci�
 - [ ] **Comprova que ha fet la tasca sencera, no només les parts fàcils.** Compara amb els teus criteris d'acceptació. De vegades els agents redueixen l'abast en silenci i informen que han acabat.
 - [ ] **Busca API inventades i coneixement obsolet.** El coneixement del model té una data de tall. Verifica versions de biblioteques, flags i signatures amb la documentació o el paquet instal·lat.
 - [ ] **Fes commits petits.** Git és el teu desfer. Fes commit després de cada increment verificat perquè un pas posterior dolent es pugui revertir per separat.
+- [ ] **Versiona les publicacions amb Semantic Versioning (versionat semàntic).** Etiqueta cada versió com `MAJOR.MINOR.PATCH`: patch per a correccions, minor per a addicions compatibles, major per a canvis incompatibles, i manté un registre de canvis organitzat per versió. Així els companys, la CI i els agents poden saber només pel número si una actualització és segura, i el registre de canvis dona al model un context que un diff no ofereix.
 - [ ] **Demana la llista de «el que no he fet».** Un bon agent informa del que ha ometut i per què. Si l'informe no ho diu, pregunta-ho.
 
 ### Seguretat bàsica
@@ -82,7 +83,7 @@ Donar forma a l'entorn perquè deixis de repetir-te i l'agent deixi de repetir e
 
 ### Model i esforç
 
-- [ ] **Coneix la gamma i els preus.** Consulta la taula de models a la secció de l'API. Les proporcions de preu determinen l'enrutament: el model superior costa deu vegades més que Sonnet per token de sortida.
+- [ ] **Coneix la gamma i els preus.** Consulta la taula de models a la secció de l'API. Les proporcions de preu determinen l'enrutament: el model superior costa cinc vegades més que Sonnet per token de sortida.
 - [ ] **Ajusta l'esforç abans de canviar de model.** L'esforç (de `low` a `max`) canvia minuciositat per tokens dins d'un mateix model. `xhigh` és el valor per defecte de Claude Code per a programació; `low` va bé per a feina mecànica i per a la majoria de subagents.
 - [ ] **Orquestrador fort, mans barates.** La sessió que sosté la tasca i pren les decisions de criteri corre amb el model superior; els agents que fan feina acotada corren amb models més barats.
 - [ ] **El mode ràpid és el mateix model amb recàrrec.** `/fast` augmenta la velocitat de sortida, no la capacitat. Fes-lo servir en sessions interactives on la latència fa mal, no per a feina per lots.

@@ -29,7 +29,7 @@ npm run check     # every translation must match the English structure
 npm run build     # writes agent-fundamentals/ (open agent-fundamentals/index.html)
 ```
 
-Item ids are a hash of each English item's bold lead, assigned to translations by position, so ticks carry across languages and survive reordering. Rewording an English lead resets that one item's ticks.
+Item ids are a hash of each English item's bold lead, assigned to translations by position, so ticks carry across languages and survive reordering within a section (moving an item to another section changes its id). Rewording an English lead resets that one item's ticks.
 
 ## Deploying
 
@@ -42,6 +42,10 @@ vercel deploy --prod
 ## Built by
 
 **Marc Fors** · [GitHub](https://github.com/marcfs31) · [LinkedIn](https://www.linkedin.com/in/marc-fors) · [marcfors.com](https://marcfors.com)
+
+## Versioning
+
+Releases follow [Semantic Versioning](https://semver.org/) and are tagged `vMAJOR.MINOR.PATCH`; see [CHANGELOG.md](CHANGELOG.md). The current version is read from `package.json` and shown in the page footer.
 
 ## Licence
 

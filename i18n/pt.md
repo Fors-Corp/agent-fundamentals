@@ -33,6 +33,7 @@ Os hábitos que contam desde a primeira sessão. Nenhum exige configuração.
 - [ ] **Verifique se fez a tarefa toda e não apenas as partes fáceis.** Compare com os seus critérios de aceitação. Por vezes os agentes reduzem o âmbito em silêncio e comunicam a conclusão.
 - [ ] **Procure APIs inventadas e conhecimento desatualizado.** O conhecimento do modelo tem uma data limite. Confirme versões de bibliotecas, flags e assinaturas na documentação ou no pacote instalado.
 - [ ] **Faça commits pequenos.** O Git é o seu mecanismo de anular. Faça commit após cada incremento verificado, para que um passo posterior mal feito possa ser revertido isoladamente.
+- [ ] **Versione as versões com Semantic Versioning.** Etiquete cada versão como `MAJOR.MINOR.PATCH`: patch para correções, minor para acrescentos compatíveis, major para alterações incompatíveis, e mantenha um changelog organizado por versão. Colegas, CI e agentes conseguem então saber só pelo número se uma atualização é segura, e o changelog dá ao modelo contexto que um diff não dá.
 - [ ] **Peça a lista do "que não fiz".** Um bom agente indica o que saltou e porquê. Se o relatório não o diz, pergunte.
 
 ### Noções básicas de segurança
@@ -82,7 +83,7 @@ Moldar o ambiente para deixar de se repetir e para que o agente deixe de repetir
 
 ### Modelo e esforço
 
-- [ ] **Conheça a gama e os preços.** Veja a tabela de modelos na secção da API. As proporções de preço determinam o encaminhamento: o modelo de topo custa dez vezes o Sonnet por token de saída.
+- [ ] **Conheça a gama e os preços.** Veja a tabela de modelos na secção da API. As proporções de preço determinam o encaminhamento: o modelo de topo custa cinco vezes o Sonnet por token de saída.
 - [ ] **Ajuste o esforço antes de trocar de modelo.** O esforço (`low` a `max`) troca profundidade por tokens dentro de um mesmo modelo. `xhigh` é a predefinição do Claude Code para programação; `low` convém ao trabalho mecânico e à maioria dos subagentes.
 - [ ] **Orquestrador forte, executores baratos.** A sessão que detém a tarefa e toma as decisões de juízo corre no modelo de topo; os agentes que fazem trabalho delimitado correm em modelos mais baratos.
 - [ ] **O modo rápido é o mesmo modelo com um sobrepreço.** `/fast` aumenta a velocidade de saída, não a capacidade. Use-o em sessões interativas em que a latência prejudica, não em trabalho em lote.
