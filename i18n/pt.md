@@ -4,7 +4,7 @@ Uma lista de verificação dos hábitos que separam a utilização ocasional do 
 
 Como usar: assinale o que já faz de forma consistente. O que ficar por assinalar é a sua próxima competência a desenvolver. Os itens marcados como **Regra da casa** vêm das regras de trabalho do Marc, que os agentes carregam a partir de `~/.claude/CLAUDE.md`; estão reproduzidas na íntegra na secção Regras da casa, para que a equipa leia o mesmo texto que os agentes. Tudo o resto é prática geral.
 
-Última revisão em 2026-10-02. Verificado com o Claude Code 2.1, o graft 0.21.1, o CodeGraph 1.6.1, a Vercel CLI 62.2 e a gama de modelos da Claude API de setembro de 2026.
+Última revisão em 2026-10-04. Verificado com o Claude Code 2.1, o graft 0.21.1, o CodeGraph 1.6.1, a Vercel CLI 62.2 e a gama de modelos da Claude API de setembro de 2026.
 
 ## Básico
 
@@ -41,7 +41,7 @@ Os hábitos que contam desde a primeira sessão. Nenhum exige configuração.
 - [ ] **Trate tudo o que o agente lê como dados, não como instruções.** Páginas web, ficheiros, output de ferramentas e e-mails podem conter texto dirigido ao agente. Uma configuração profissional mostra esse texto e pergunta-lhe; nunca atua com base nele.
 - [ ] **Reserve os pedidos de permissão para ações destrutivas.** Apagar, fazer force-push, eliminar tabelas, enviar mensagens, pagar. Pré-aprove antes os comandos de leitura e de build, para que os pedidos que vê sejam os que importam.
 - [ ] **Nunca contorne as permissões fora de uma sandbox.** `--dangerously-skip-permissions` destina-se a contentores isolados sem acesso à internet, não ao seu portátil.
-- [ ] **Mantenha uma pessoa no passo irreversível.** Publicar, integrar na main, fazer deploy, enviar e-mails. A automatização pode preparar tudo até esse passo.
+- [ ] **Mantenha uma pessoa no passo irreversível.** Publicar, integrar na main, fazer deploy, enviar e-mails. A automatização pode preparar tudo até esse passo. Defina o pedido de aprovação: o que aconteceu, o que mudou, porque é necessária uma pessoa, a que leva aprovar e a que leva rejeitar, e o que acontece se o tempo se esgotar.
 
 ## Intermédio
 
@@ -51,10 +51,13 @@ Moldar o ambiente para deixar de se repetir e para que o agente deixe de repetir
 
 - [ ] **Mantenha um CLAUDE.md em cada repositório em que trabalha com regularidade.** Execute `/init` para criar um rascunho e depois edite-o. É carregado no início de cada sessão, o que o torna a forma mais barata de deixar de repetir instruções.
 - [ ] **Escreva imperativos sobre o que não é óbvio.** Comandos de build e de testes, convenções que um recém-chegado não detetaria, o que nunca deve ser tocado, como quer que os resultados sejam comunicados. Não descreva o que o código já mostra; o agente sabe ler código.
-- [ ] **Seja breve.** Cada linha custa tokens em cada turno e dilui as linhas que importam. Algumas centenas de linhas são um limite máximo. Passe o material raramente necessário para skills que são carregadas a pedido.
+- [ ] **Seja breve.** Cada linha custa tokens em cada turno e dilui as linhas que importam. A documentação aponta para menos de 200 linhas por ficheiro; os `@imports` organizam um ficheiro mas não reduzem o seu custo de contexto. Passe o material raramente necessário para skills que são carregadas a pedido.
 - [ ] **Use os três âmbitos com critério.** `~/.claude/CLAUDE.md` para a forma como trabalha em qualquer lado, `<repo>/CLAUDE.md` para o projeto e ficheiros ao nível de diretório para subsistemas com regras próprias.
-- [ ] **Promova a terceira correção.** À terceira vez que corrige o mesmo comportamento no chat, ele pertence ao CLAUDE.md ou a um hook. A skill `claude-md-improver` revê o ficheiro à procura de linhas obsoletas ou contraditórias.
+- [ ] **Promova a terceira correção.** À terceira vez que corrige o mesmo comportamento no chat, ele pertence ao CLAUDE.md ou a um hook. Elimine as regras obsoletas ou que se contradizem: com duas linhas em conflito o Claude pode seguir qualquer uma, e o `/doctor prompt-audit` encontra-as. A skill `claude-md-improver` também revê o ficheiro à procura de linhas obsoletas ou contraditórias.
 - [ ] **Deixe a memória guardar factos, não regras.** A memória automática do Claude Code regista factos e preferências do projeto entre sessões. Elimine as entradas que ficam obsoletas; uma memória errada é pior do que nenhuma.
+- [ ] **Faça um teste de sessão nova no seu repositório.** Abra uma sessão nova sem qualquer contexto verbal e faça cinco perguntas: o que é este sistema, como está organizado, como o executo, como o verifico, em que ponto estamos. Cada pergunta a que não consegue responder só com o repositório é uma lacuna no CLAUDE.md ou na documentação para que ele aponta.
+- [ ] **Guarde as preferências pessoais do projeto em CLAUDE.local.md e coloque-o no gitignore.** URLs de sandbox, dados de teste preferidos, caminhos locais. É carregado a par do CLAUDE.md do projeto e tratado da mesma forma; as regras da equipa ficam no ficheiro versionado, e a política gerida é carregada acima de ambos.
+- [ ] **Mantenha as entradas do índice da memória automática numa só linha.** Só as primeiras 200 linhas ou 25KB do MEMORY.md são carregadas por sessão; o detalhe pertence a ficheiros por tema que o Claude lê a pedido. Não o deixe guardar o que o repositório já mostra.
 
 ### Gestão de contexto
 
@@ -64,6 +67,7 @@ Moldar o ambiente para deixar de se repetir e para que o agente deixe de repetir
 - [ ] **Não volte a ler um ficheiro que acabou de editar.** A ferramenta de edição falha de forma explícita se o alvo tiver mudado, pelo que reler para "verificar" é custo puro.
 - [ ] **Prefira texto a capturas de ecrã.** Num navegador, ler o texto da página ou a árvore de acessibilidade é mais barato e mais preciso do que uma captura de ecrã. Use capturas só para o aspeto visual.
 - [ ] **Reduza os servidores MCP ligados.** Os esquemas de ferramentas de cada servidor podem entrar no contexto. Ligue o que a tarefa exige e desative o resto; o carregamento diferido de ferramentas ajuda, mas menos servidores ajuda mais.
+- [ ] **Passe o testemunho a uma sessão nova antes de a janela encher.** Para trabalho que dura mais do que uma sessão, escreva o ficheiro de progresso e as decisões tomadas, depois comece de novo e leia-o primeiro, em vez de compactar vezes sem conta. A compactação guarda o que foi feito e tende a perder o porquê; uma sessão nova só tem o que ficou escrito.
 
 ### Skills, hooks e permissões
 
@@ -80,6 +84,8 @@ Moldar o ambiente para deixar de se repetir e para que o agente deixe de repetir
 - [ ] **Dimensione o modelo para a tarefa.** Haiku para varrimentos mecânicos, Sonnet para implementação delimitada, o modelo de topo para decisões de juízo. Indique sempre o modelo e o motivo. (House rule)
 - [ ] **Lance agentes independentes numa única mensagem.** Lançá-los em série desperdiça tempo real. Agentes que não partilham ficheiros podem correr em conjunto e terminar em conjunto.
 - [ ] **Defina agentes reutilizáveis uma só vez.** Os ficheiros de agentes em `.claude/agents/*.md` trazem o modelo, o esforço e as ferramentas no frontmatter, de modo que o briefing é a única coisa que varia.
+- [ ] **Sintetize antes de delegar.** Leia as conclusões do explorador e escreva ao implementador uma especificação precisa: qual dos três fluxos, que abordagem, o que devolver. "Com base nas suas conclusões, corrija-o" entrega o raciocínio mais difícil a um executor com o menor contexto.
+- [ ] **Mantenha a delegação a um só nível, a menos que queira outra coisa.** Por defeito, um subagente pode lançar os seus próprios subagentes até três camadas abaixo, cada um com um contexto novo que paga e não consegue ver. Defina `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1`, ou omita `Agent` nas `tools` de um executor, para que os pedidos de ajuda regressem ao orquestrador.
 
 ### Modelo e esforço
 
@@ -93,7 +99,8 @@ Moldar o ambiente para deixar de se repetir e para que o agente deixe de repetir
 - [ ] **Testes próprios durante o trabalho, a suite completa uma só vez no fim.** Execute apenas os ficheiros de teste que cobrem o que está a alterar; execute a suite inteira como verificação final e só voltar a fazê-lo se essa execução tiver falhado e tiver alterado algo. (House rule)
 - [ ] **Peça provas na mensagem final.** Output dos testes, uma captura de ecrã, o resultado de um `curl`. Verificado e concluído são estados diferentes; faça o agente dizer qual deles atingiu.
 - [ ] **Faça uma revisão de segunda opinião.** `/code-review` sobre o diff para encontrar bugs, `/simplify` para limpeza e `/security-review` antes de integrar qualquer coisa que toque em input, autenticação ou segredos.
-- [ ] **Separe o autor do revisor.** Reveja numa sessão nova ou com outro agente. Aquele que escreveu o código partilha os seus pontos cegos.
+- [ ] **Escreva uma definição de concluído que o agente possa executar, por ordem.** Verificações estáticas, depois testes unitários e de integração, depois uma execução do fluxo real (arrancar a aplicação, chamar o endpoint, mostrar o output). Testes unitários com mocks em verde não provam uma alteração entre componentes; uma alteração não está concluída até passar o último nível de que precisa.
+- [ ] **Separe o autor do revisor.** Reveja numa sessão nova ou com outro agente. Aquele que escreveu o código partilha os seus pontos cegos, e um subagente começa com um contexto novo, razão pela qual é melhor revisor do que a sessão que escreveu o código.
 
 ## Pro
 
@@ -109,6 +116,17 @@ Orquestração, automatização e governação. Estes itens pressupõem que já 
 - [ ] **Delimite pelo orçamento, não pela ambição.** Verifique a quota antes de lançar, diga quanto a execução vai custar e comunique a despesa face ao limite no final. Um fluxo de trabalho bem delimitado vale mais do que três superficiais. (House rule)
 - [ ] **Traga as decisões de volta como provas.** Quando uma fase levanta uma decisão para o responsável, apresente a medição que a resolve e as opções com as respetivas consequências. Registe a resposta e as afirmações que falharam a verificação. (House rule)
 - [ ] **Use a ferramenta Workflow para orquestração determinística.** Um script com chamadas `pipeline`, `parallel` e `agent`, fases e outputs validados por esquema. Só corre quando o utilizador o autoriza, porque pode gastar tokens equivalentes a dezenas de agentes.
+- [ ] **Acorde um contrato curto antes de uma construção longa.** Antes de escrever código, o construtor e o revisor acordam por escrito o que significa "concluído" para este bloco: âmbito, como se verifica cada parte e o que fica de fora. O revisor pontua pela mesma lista, para que nada seja rejeitado por um motivo previsível.
+- [ ] **Dê ao agente revisor uma rubrica e calibre-a pelo seu próprio juízo.** Categorias fixas (correção, prova de que as verificações correram, disciplina de âmbito, sobrevive a um reinício, preparação para a passagem de testemunho) e um veredicto de aceitar, rever ou bloquear. Os agentes a quem se pede que avaliem trabalho elogiam-no; um revisor pode apontar um problema real e depois convencer-se a aprovar. Leia as suas transcrições, encontre onde o veredicto divergiu do seu e afine o prompt para esse caso.
+
+### Trabalho de longa duração e em várias sessões
+
+- [ ] **Execute a preparação como uma sessão própria antes do trabalho nas funcionalidades.** A primeira sessão apenas torna o projeto executável e verificável: as dependências instalam-se, um teste passa, um script de inicialização guarda os comandos de arranque e de verificação, o trabalho está dividido numa lista de funcionalidades e existe um commit de base limpo. O andaime e a primeira funcionalidade não partilham a mesma sessão.
+- [ ] **Mantenha uma lista de funcionalidades legível por máquina para o trabalho em várias sessões.** Um ficheiro JSON no repositório em que cada item tem o comportamento visível ao utilizador, os passos exatos de verificação, um estado (não iniciado, em curso, bloqueado, a passar) e um campo de prova. O agente escolhe daí o item seguinte; é o ficheiro, e não a conversa, que diz o que está concluído. JSON em vez de Markdown: é menos provável que o modelo o reescreva.
+- [ ] **Não deixe o agente avaliar-se a si próprio na lista de funcionalidades.** Passar exige que a verificação registada tenha corrido, com o output anexado. Diga-lhe que o estado só muda depois da verificação, e que apagar, enfraquecer ou reescrever testes ou entradas da lista para esconder trabalho inacabado é inaceitável; sempre que possível, ponha os testes e os scripts de avaliação atrás de uma regra `permissions.deny` para que o agente que trabalha não possa editar o juiz.
+- [ ] **Limite o trabalho em curso a uma funcionalidade.** Escreva-o no CLAUDE.md: conclua e verifique a funcionalidade atual antes de iniciar a seguinte, e não refatore outra coisa em paralelo. Perante um briefing amplo, um agente tende a começar várias coisas ao mesmo tempo e deixar todas a meio.
+- [ ] **Mantenha um ficheiro de progresso que a sessão seguinte lê primeiro.** Um ficheiro curto no repositório com o estado verificado, o que mudou, o que está avariado ou por verificar, o melhor passo seguinte e os comandos exatos de arranque e de verificação. O CLAUDE.md diz ao agente que o leia no início e que o atualize e faça commit dele antes de parar; nada o atualiza automaticamente. Uma execução agendada que parte de um clone novo precisa do mesmo ficheiro.
+- [ ] **Dê ao agente uma rotina fixa de início de sessão.** No CLAUDE.md: `pwd`, ler o ficheiro de progresso e a lista de funcionalidades, `git log --oneline -5`, executar o script de inicialização, executar uma verificação rápida. Se a base já estiver avariada, corrija isso antes de qualquer trabalho novo.
 
 ### Execuções sem interface e agendadas
 
@@ -116,19 +134,26 @@ Orquestração, automatização e governação. Estes itens pressupõem que já 
 - [ ] **Agende rotinas para o trabalho recorrente.** Os agentes agendados na cloud (`/schedule`) tratam de relatórios noturnos e verificações de dependências. `/loop` consulta periodicamente um estado externo lento dentro de uma sessão; não serve para tarefas pontuais.
 - [ ] **Dê aos agentes de CI apenas as ferramentas de que precisam.** Listas de permissões, tokens só de leitura e nenhum direito de push, a menos que fazer push seja o trabalho.
 - [ ] **Registe cada execução.** Transcrição, custo, resultado. Reveja as falhas semanalmente; são a fonte mais barata de melhorias para o CLAUDE.md e para os hooks.
+- [ ] **Escolha entre um objetivo e um ciclo perguntando se o trabalho tem fim.** Uma meta (todos os testes em `test/auth` passam, o backlog está vazio) é um `/goal`: um modelo pequeno separado verifica a condição após cada turno e a sessão continua a trabalhar até ela ser cumprida ou considerada impossível. Algo que só precisa de continuar a vigiar (o CI está verde) é um `/loop` com um intervalo. Ambos têm o âmbito da sessão.
+- [ ] **Escreva um objetivo que o avaliador consiga ler na transcrição.** Um único estado final mensurável, o comando que o prova (`npm test` termina com 0, `git status` está limpo), as restrições que têm de se manter pelo caminho e um limite como "ou pare após 20 turnos". O avaliador não executa comandos nem lê ficheiros; só julga o que o agente mostrou, por isso faça o agente imprimir a prova.
+- [ ] **Limite todas as execuções sem supervisão.** No modo de impressão, `--max-turns` e `--max-budget-usd` travam uma sessão descontrolada, e a despesa dos subagentes conta para o orçamento; num `/goal`, ponha o limite de turnos ou de tempo na condição; um `/loop` recorrente expira ao fim de sete dias por desenho. Um ciclo sem limite transforma um teste preso numa fatura de uma noite inteira.
+- [ ] **Ajuste a camada de agendamento à duração que o trabalho tem de sobreviver.** O `/loop` exige a sessão aberta, corre com um mínimo de um minuto e expira ao fim de sete dias; uma tarefa agendada no desktop corre enquanto a sua máquina estiver ligada, também até um minuto; uma rotina na cloud (`/schedule`) corre com a sua máquina desligada a partir de um clone novo, com um mínimo de uma hora, acionada por um agendamento, uma chamada de API ou um evento do GitHub.
 
 ### Hooks como barreiras
 
 - [ ] **Codifique invariantes como hooks bloqueantes.** Um hook PreToolUse que recusa git destrutivo, exige uma declaração de factos antes de comandos de shell ou obriga a uma execução de testes antes de um commit não pode ser contornado com conversa.
 - [ ] **Nunca desative uma barreira para se desbloquear.** Indique os factos que ela pede e repita a chamada idêntica. Uma barreira que se pode desligar sob pressão não é uma barreira. (House rule)
 - [ ] **Mantenha os hooks rápidos e específicos.** Um hook lento penaliza cada chamada de ferramenta; um vago habitua toda a gente a contorná-lo.
+- [ ] **Use um hook Stop como barreira de conclusão.** Corre quando o agente declara que terminou; o código de saída 2 ou `{"decision":"block","reason":...}` recusa a paragem e o motivo regressa ao agente como a sua instrução seguinte. Um hook PostToolUse não pode bloquear, mas o seu stderr numa saída 2 chega ao agente após cada edição. O `/goal` é este mecanismo com um modelo como juiz.
+- [ ] **Escreva as falhas de hooks, linters e testes para o agente, com a correção incluída.** O que falhou, porque existe a regra e a próxima ação exata ("Blocked: run `pnpm vitest run src/billing` and paste the output before committing") valem mais do que "negado". O `reason` ou o stderr de um hook bloqueante é a próxima entrada do agente; uma mensagem que só diz "violação" produz uma nova tentativa às cegas.
 
 ### Medição e avaliações
 
 - [ ] **Meça o custo por tarefa concluída, não por pedido.** `/cost` na sessão, a vista de utilização da aplicação e `graft stats` para as poupanças do índice. Um pedido mais barato que exige mais turnos não é mais barato.
 - [ ] **Construa uma avaliação antes de afinar um prompt, uma skill ou o CLAUDE.md.** Entre vinte e cinquenta casos reais com um método de classificação. Meça antes e depois; sem isso, as alterações a prompts são folclore.
-- [ ] **Audite os prompts à procura de resíduos quando os modelos mudam.** As instruções escritas para modelos mais antigos (prefills, rituais de "pensar passo a passo", formatação demasiado prescritiva) muitas vezes baixam a qualidade nos modelos atuais. A skill `claude-api` inclui o `prompt-audit`, que faz isto de forma sistemática.
+- [ ] **Audite os prompts à procura de resíduos quando os modelos mudam.** As instruções escritas para modelos mais antigos (prefills, rituais de "pensar passo a passo", formatação demasiado prescritiva) muitas vezes baixam a qualidade nos modelos atuais. Cada componente do harness codifica uma suposição sobre o que o modelo não consegue fazer; depois de uma mudança de modelo, desative um de cada vez e meça. A skill `claude-api` inclui o `prompt-audit`, que faz isto de forma sistemática.
 - [ ] **Comunique as poupanças do índice em cada turno.** O graft imprime os tokens poupados por chamada; some-os por turno e acompanhe o total da sessão na linha de estado.
+- [ ] **Ancore cada ciclo orientado por métricas a algo que ele não possa editar.** Um conjunto de verdade de referência reservado, um resultado de negócio real ou uma verificação humana periódica por amostragem. Um número que sobe enquanto o resultado real piora significa que o ciclo aprendeu a métrica, não a tarefa.
 
 ### Segurança e fronteiras de confiança
 
@@ -540,6 +565,8 @@ def ask(question: str):
 | Execução em script | `claude -p "<prompt>" --output-format json --allowedTools "Read Grep"` |
 | Execução recorrente na cloud | `/schedule` |
 | Consultar periodicamente um estado externo lento | `/loop` |
+| Continuar a trabalhar até uma condição se cumprir | `/goal <condition>` |
+| Reabrir aqui a última sessão | `claude --continue` (ou `/resume`) |
 
 ### graft
 
@@ -581,6 +608,9 @@ def ask(question: str):
 
 - Documentação do Claude Code: https://code.claude.com/docs
 - Documentação da Claude API: https://docs.anthropic.com
+- Objetivos, ciclos e rotinas do Claude Code: https://code.claude.com/docs/en/goal, https://code.claude.com/docs/en/scheduled-tasks, https://code.claude.com/docs/en/routines
+- Anthropic Engineering, Effective harnesses for long-running agents (2025-11-26): https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents
+- Anthropic Engineering, Harness design for long-running application development (2026-03-24): https://www.anthropic.com/engineering/harness-design-long-running-apps
 - graft: https://www.npmjs.com/package/@nanonets/graft (a skill instalada em `~/.claude/skills/graft/SKILL.md` é a referência operacional)
 - CodeGraph: `codegraph --help` e as instruções do servidor MCP `codegraph`
 - Regras de trabalho do Marc: `~/.claude/CLAUDE.md`

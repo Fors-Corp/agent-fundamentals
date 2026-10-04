@@ -4,7 +4,7 @@ Una llista de verificació dels hàbits que separen l'ús ocasional de Claude de
 
 Com utilitzar-la: marca el que ja fas de manera constant. El que quedi sense marcar és la teva propera habilitat per desenvolupar. Els ítems marcats amb **House rule** provenen de les regles de treball de Marc, que els agents carreguen des de `~/.claude/CLAUDE.md`; es reprodueixen íntegrament a la secció Regles de la casa perquè l'equip llegeixi el mateix text que els agents. Tota la resta és pràctica general.
 
-Darrera revisió: 2026-10-02. Verificat amb Claude Code 2.1, graft 0.21.1, CodeGraph 1.6.1, Vercel CLI 62.2 i la gamma de models de l'API de Claude del setembre de 2026.
+Darrera revisió: 2026-10-04. Verificat amb Claude Code 2.1, graft 0.21.1, CodeGraph 1.6.1, Vercel CLI 62.2 i la gamma de models de l'API de Claude del setembre de 2026.
 
 ## Bàsic
 
@@ -41,7 +41,7 @@ Els hàbits que compten des de la primera sessió. Cap no requereix configuraci�
 - [ ] **Tracta tot el que l'agent llegeix com a dades, no com a instruccions.** Pàgines web, fitxers, sortides d'eines i correus poden portar text dirigit a l'agent. Una configuració professional el mostra i et pregunta; mai hi actua.
 - [ ] **Reserva els avisos de permís per a les accions destructives.** Esborrar, fer force-push, eliminar taules, enviar missatges, pagar. Preaprova en canvi les ordres de només lectura i de compilació, de manera que els avisos que vegis siguin els que importen.
 - [ ] **No ometis mai els permisos fora d'un sandbox.** `--dangerously-skip-permissions` és per a contenidors aïllats sense accés a internet, no per al teu portàtil.
-- [ ] **Mantén una persona en el pas irreversible.** Publicar, fusionar a main, desplegar, enviar correus. L'automatització pot preparar-ho tot fins a aquest pas.
+- [ ] **Mantén una persona en el pas irreversible.** Publicar, fusionar a main, desplegar, enviar correus. L'automatització pot preparar-ho tot fins a aquest pas. Defineix la sol·licitud d'aprovació: què ha passat, què ha canviat, per què cal una persona, a què porta aprovar i a què porta rebutjar, i què passa si s'esgota el temps d'espera.
 
 ## Intermedi
 
@@ -51,10 +51,13 @@ Donar forma a l'entorn perquè deixis de repetir-te i l'agent deixi de repetir e
 
 - [ ] **Tingues un CLAUDE.md a cada repositori on treballis amb regularitat.** Executa `/init` per fer-ne un esborrany i després edita'l. Es carrega a l'inici de cada sessió, i per això és la manera més barata d'evitar repetir instruccions.
 - [ ] **Escriu imperatius sobre el que no és obvi.** Ordres de compilació i de test, convencions que un recent arribat se saltaria, què no s'ha de tocar mai, com vols que s'informin els resultats. No descriguis el que el codi ja mostra; l'agent pot llegir codi.
-- [ ] **Mantén-lo curt.** Cada línia costa tokens a cada torn i dilueix les línies que importen. Unes quantes centenes de línies són un límit superior. Passa el material que rarament cal a skills que es carreguen a demanda.
+- [ ] **Mantén-lo curt.** Cada línia costa tokens a cada torn i dilueix les línies que importen. La documentació recomana menys de 200 línies per fitxer; els `@imports` organitzen un fitxer però no en redueixen el cost de context. Passa el material que rarament cal a skills que es carreguen a demanda.
 - [ ] **Fes servir els tres àmbits amb criteri.** `~/.claude/CLAUDE.md` per a com treballes arreu, `<repo>/CLAUDE.md` per al projecte, i fitxers a nivell de directori per a subsistemes amb regles pròpies.
-- [ ] **Promou la tercera correcció.** La tercera vegada que corregeixes el mateix comportament al xat, ha d'anar a CLAUDE.md o a un hook. La skill `claude-md-improver` revisa el fitxer a la recerca de línies obsoletes o contradictòries.
+- [ ] **Promou la tercera correcció.** La tercera vegada que corregeixes el mateix comportament al xat, ha d'anar a CLAUDE.md o a un hook. Elimina les regles obsoletes o que es contradiuen: amb dues línies en conflicte Claude pot seguir qualsevol de les dues, i `/doctor prompt-audit` les troba. La skill `claude-md-improver` també revisa el fitxer a la recerca de línies obsoletes o contradictòries.
 - [ ] **Deixa que la memòria guardi fets, no regles.** La memòria automàtica de Claude Code registra fets i preferències del projecte entre sessions. Poda les entrades que s'han quedat obsoletes; una memòria errònia és pitjor que cap.
+- [ ] **Fes una prova de sessió nova al teu repositori.** Obre una sessió nova sense cap context verbal i fes cinc preguntes: què és aquest sistema, com està organitzat, com s'executa, com es verifica, on som ara. Cada pregunta que no pot respondre només amb el repositori és un buit a CLAUDE.md o a la documentació a què apunta.
+- [ ] **Guarda les preferències personals del projecte a CLAUDE.local.md i afegeix-lo al gitignore.** URL de sandbox, dades de prova preferides, rutes locals. Es carrega juntament amb el CLAUDE.md del projecte i es tracta de la mateixa manera; les regles de l'equip es queden al fitxer versionat, i la política gestionada es carrega per sobre dels dos.
+- [ ] **Mantén les entrades de l'índex de la memòria automàtica en una sola línia.** Només es carreguen per sessió les primeres 200 línies o 25KB de MEMORY.md; el detall pertany als fitxers temàtics que Claude llegeix a demanda. No deixis que hi desi el que el repositori ja mostra.
 
 ### Gestió del context
 
@@ -64,6 +67,7 @@ Donar forma a l'entorn perquè deixis de repetir-te i l'agent deixi de repetir e
 - [ ] **No tornis a llegir un fitxer que acabes d'editar.** L'eina d'edició falla amb claredat si el seu objectiu ha canviat, de manera que rellegir per «verificar» és cost pur.
 - [ ] **Prefereix text a captures de pantalla.** En un navegador, llegir el text de la pàgina o l'arbre d'accessibilitat és més barat i més precís que una captura. Fes captura només per al disseny visual.
 - [ ] **Poda els servidors MCP connectats.** Els esquemes d'eines de cada servidor poden entrar al context. Connecta el que la tasca necessita i desactiva la resta; la càrrega diferida d'eines ajuda, però tenir-ne menys ajuda més.
+- [ ] **Passa el relleu a una sessió nova abans que la finestra s'ompli.** Per a una feina que dura més d'una sessió, escriu el fitxer de progrés i les decisions preses, després comença de nou i llegeix-lo primer, en lloc de compactar una vegada i una altra. La compactació conserva el que s'ha fet i tendeix a perdre el perquè; una sessió nova només té el que has deixat escrit.
 
 ### Skills, hooks i permisos
 
@@ -80,6 +84,8 @@ Donar forma a l'entorn perquè deixis de repetir-te i l'agent deixi de repetir e
 - [ ] **Dimensiona el model segons la tasca.** Haiku per a escombrades mecàniques, Sonnet per a implementació acotada, el model superior per al criteri. Indica cada vegada el model i el motiu. (House rule)
 - [ ] **Llança els agents independents en un sol missatge.** Llançar-los en sèrie malbarata temps de rellotge. Els agents que no comparteixen fitxers poden córrer junts i acabar junts.
 - [ ] **Defineix els agents reutilitzables una sola vegada.** Els fitxers d'agent a `.claude/agents/*.md` porten el model, l'esforç i les eines al frontmatter, de manera que l'encàrrec és l'únic que varia.
+- [ ] **Sintetitza abans de delegar.** Llegeix les conclusions de l'explorador i escriu a l'implementador una especificació precisa: quin dels tres fluxos, quin enfocament, què ha de tornar. «Segons les teves conclusions, arregla-ho» posa el pensament més difícil en mans d'un treballador amb menys context.
+- [ ] **Mantén la delegació a un sol nivell tret que vulguis una altra cosa.** Per defecte un subagent pot llançar els seus propis subagents fins a tres capes més avall, cadascun amb un context nou que pagues i no pots veure. Defineix `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1`, o omet `Agent` de les `tools` d'un treballador, perquè les peticions d'ajuda tornin a l'orquestrador.
 
 ### Model i esforç
 
@@ -93,7 +99,8 @@ Donar forma a l'entorn perquè deixis de repetir-te i l'agent deixi de repetir e
 - [ ] **Tests propis mentre treballes, suite completa una sola vegada al final.** Executa només els fitxers de test que cobreixen el que estàs canviant; executa tota la suite com a gate final, i de nou només si aquella execució ha fallat i has canviat alguna cosa. (House rule)
 - [ ] **Demana proves al missatge final.** Sortida dels tests, una captura de pantalla, un resultat de `curl`. Verificat i fet són estats diferents; fes que l'agent digui quin dels dos ha assolit.
 - [ ] **Fes una revisió de segona opinió.** `/code-review` sobre el diff per a errors, `/simplify` per a la neteja, `/security-review` abans de fusionar res que toqui entrades, autenticació o secrets.
-- [ ] **Separa l'autor del revisor.** Revisa en una sessió nova o amb un agent diferent. Qui ha escrit el codi comparteix els seus punts cecs.
+- [ ] **Escriu una definició de fet que l'agent pugui executar, per ordre.** Comprovacions estàtiques, després tests unitaris i d'integració, després una execució del flux real (arrenca l'aplicació, crida l'endpoint, mostra la sortida). Uns tests unitaris amb mocks en verd no proven un canvi entre components; un canvi no està fet fins que ha passat l'últim nivell que necessita.
+- [ ] **Separa l'autor del revisor.** Revisa en una sessió nova o amb un agent diferent. Qui ha escrit el codi comparteix els seus punts cecs, i un subagent comença amb un context nou, per això és un millor revisor que la sessió que ha escrit el codi.
 
 ## Pro
 
@@ -109,6 +116,17 @@ Orquestració, automatització i governança. Aquests ítems suposen que ja fas 
 - [ ] **Acota per pressupost, no per ambició.** Comprova la quota abans de llançar, digues què costarà l'execució, informa de la despesa respecte al límit al final. Un únic flux de treball ben acotat val més que tres de prims. (House rule)
 - [ ] **Torna les decisions com a evidència.** Quan una etapa planteja una decisió per al propietari, presenta la mesura que la resol i les opcions amb les seves conseqüències. Registra la resposta i les afirmacions que no han superat la verificació. (House rule)
 - [ ] **Fes servir l'eina Workflow per a l'orquestració determinista.** Un script amb crides `pipeline`, `parallel` i `agent`, fases i sortides validades per esquema. Només s'executa si l'usuari ho accepta, perquè pot gastar tokens equivalents a desenes d'agents.
+- [ ] **Acorda un contracte breu abans d'una construcció llarga.** Abans d'escriure codi, el constructor i el revisor acorden per escrit què vol dir «fet» per a aquest tros: abast, com es verifica cada part i què queda fora d'abast. El revisor puntua amb la mateixa llista, de manera que res es rebutja per un motiu previsible.
+- [ ] **Dona a l'agent revisor una rúbrica i calibra'l amb el teu propi criteri.** Categories fixes (correcció, evidència que les comprovacions s'han executat, disciplina d'abast, sobreviu a un reinici, preparació del relleu) i un veredicte d'acceptar, revisar o bloquejar. Als agents a qui es demana valorar una feina, l'elogien; un revisor pot assenyalar un problema real i després convèncer-se a si mateix d'aprovar. Llegeix les seves transcripcions, troba on el veredicte ha divergit del teu i ajusta el seu prompt per a aquest cas.
+
+### Feina de llarga durada i de diverses sessions
+
+- [ ] **Fes la configuració com una sessió pròpia abans de la feina de funcionalitats.** La primera sessió només fa que el projecte es pugui executar i verificar: les dependències s'instal·len, un test passa, un script d'inici conté les ordres d'arrencada i de verificació, la feina es divideix en una llista de funcionalitats i hi ha un commit de línia base net. L'esquelet i la primera funcionalitat no comparteixen sessió.
+- [ ] **Mantén una llista de funcionalitats llegible per màquina per a la feina de diverses sessions.** Un fitxer JSON al repositori on cada ítem té el comportament visible per a l'usuari, els passos exactes de verificació, un estat (no iniciat, en curs, bloquejat, superat) i un camp d'evidència. L'agent n'escull el següent ítem; el fitxer, no el xat, diu què està fet. JSON millor que Markdown: és menys probable que el model el reescrigui.
+- [ ] **No deixis que l'agent s'avaluï a si mateix a la llista de funcionalitats.** Superar exigeix que la verificació registrada s'hagi executat, amb la sortida adjunta. Digues-li que l'estat només canvia després de la comprovació, i que esborrar, afeblir o reescriure tests o entrades de funcionalitats per amagar feina inacabada és inacceptable; allà on puguis, posa els tests i els scripts d'avaluació darrere d'una regla `permissions.deny` perquè l'agent que treballa no pugui editar el jutge.
+- [ ] **Limita la feina en curs a una sola funcionalitat.** Escriu-ho a CLAUDE.md: acaba i verifica la funcionalitat actual abans de començar la següent, i no refactoritzis una altra cosa de passada. Davant d'un encàrrec ampli, un agent tendeix a començar diverses coses alhora i deixar-les totes a mitges.
+- [ ] **Mantén un fitxer de progrés que la sessió següent llegeixi primer.** Un fitxer curt al repositori amb l'estat verificat, què ha canviat, què està trencat o sense verificar, el millor pas següent i les ordres exactes d'arrencada i de verificació. CLAUDE.md diu a l'agent que el llegeixi a l'inici i que l'actualitzi i en faci commit abans d'aturar-se; res no l'actualitza automàticament. Una execució programada que parteix d'un clon nou necessita el mateix fitxer.
+- [ ] **Dona a l'agent una rutina fixa d'inici de sessió.** A CLAUDE.md: `pwd`, llegir el fitxer de progrés i la llista de funcionalitats, `git log --oneline -5`, executar l'script d'inici, executar una comprovació ràpida. Si la línia base ja està trencada, arregla això abans de qualsevol feina nova.
 
 ### Execucions sense interfície i programades
 
@@ -116,19 +134,26 @@ Orquestració, automatització i governança. Aquests ítems suposen que ja fas 
 - [ ] **Programa rutines per a la feina recurrent.** Els agents programats al núvol (`/schedule`) s'encarreguen d'informes nocturns i comprovacions de dependències. `/loop` consulta periòdicament un estat extern lent dins d'una sessió; no serveix per a tasques puntuals.
 - [ ] **Dona als agents de CI només les eines que necessiten.** Llistes de permesos, tokens de només lectura i cap permís de push tret que fer push sigui la feina.
 - [ ] **Registra cada execució.** Transcripció, cost, resultat. Revisa els errors cada setmana; són la font més barata de millores per a CLAUDE.md i els hooks.
+- [ ] **Tria entre un objectiu i un bucle preguntant-te si la feina té final.** Una meta (tots els tests de `test/auth` passen, la llista de tasques pendents és buida) és un `/goal`: un model petit separat comprova la condició després de cada torn i la sessió continua treballant fins que es compleix o es jutja impossible. Allò que només necessites vigilar (la CI està en verd) és un `/loop` amb un interval. Tots dos són d'àmbit de sessió.
+- [ ] **Escriu un objectiu que l'avaluador pugui llegir a la transcripció.** Un únic estat final mesurable, l'ordre que el demostra (`npm test` surt amb 0, `git status` és net), les restriccions que s'han de mantenir pel camí i un límit com ara «o atura't després de 20 torns». L'avaluador no executa ordres ni llegeix fitxers; només jutja el que l'agent ha mostrat, així que fes que l'agent imprimeixi la prova.
+- [ ] **Posa un límit a cada execució desatesa.** En mode print, `--max-turns` i `--max-budget-usd` aturen una sessió descontrolada, i la despesa dels subagents compta per al pressupost; en un `/goal`, posa el límit de torns o de temps a la condició; un `/loop` recurrent caduca als set dies per disseny. Un bucle sense límit converteix un únic test encallat en una factura de tota la nit.
+- [ ] **Fes coincidir la capa de programació amb el temps que la feina ha de sobreviure.** `/loop` necessita la sessió oberta, s'executa com a mínim cada minut i caduca als set dies; una tasca programada d'escriptori s'executa mentre la teva màquina és encesa, també fins a un minut; una rutina al núvol (`/schedule`) s'executa amb la teva màquina apagada des d'un clon nou, amb un mínim d'una hora, activada per una programació, una crida d'API o un esdeveniment de GitHub.
 
 ### Hooks com a gates
 
 - [ ] **Codifica els invariants com a hooks bloquejants.** Un hook PreToolUse que rebutja git destructiu, exigeix una declaració de fets abans de les ordres de shell o requereix executar els tests abans d'un commit no es pot esquivar amb arguments.
 - [ ] **No desactivis mai un gate per desbloquejar-te.** Indica els fets que demana i repeteix la mateixa crida idèntica. Un gate que pots apagar sota pressió no és un gate. (House rule)
 - [ ] **Mantén els hooks ràpids i específics.** Un hook lent grava cada crida d'eina; un de vague ensenya a tothom a ometre'l.
+- [ ] **Fes servir un hook Stop com a gate de finalització.** S'executa quan l'agent declara que ha acabat; el codi de sortida 2 o `{"decision":"block","reason":...}` refusa l'aturada i el motiu torna a l'agent com a següent instrucció. Un hook PostToolUse no pot bloquejar, però el seu stderr amb sortida 2 arriba a l'agent després de cada edició. `/goal` és aquest mecanisme amb un model com a jutge.
+- [ ] **Escriu els errors de hooks, linters i tests pensant en l'agent, amb la correcció inclosa.** Què ha fallat, per què existeix la regla i l'acció següent exacta («Blocked: run `pnpm vitest run src/billing` and paste the output before committing») val més que «denied». El `reason` o l'stderr d'un hook bloquejant és la següent entrada de l'agent; un missatge que només diu «violation» produeix un reintent cec.
 
 ### Mesura i avaluacions
 
 - [ ] **Segueix el cost per tasca completada, no per petició.** `/cost` a la sessió, la vista d'ús de l'aplicació i `graft stats` per a l'estalvi de l'índex. Una petició més barata que necessita més torns no és més barata.
 - [ ] **Construeix una avaluació abans d'afinar un prompt, una skill o CLAUDE.md.** Entre vint i cinquanta casos reals amb un mètode de qualificació. Mesura abans i després; sense això, els canvis de prompt són folklore.
-- [ ] **Audita els prompts a la recerca de restes quan canvien els models.** Les instruccions escrites per a models anteriors (prefills, rituals de «pensa pas a pas», format excessivament prescriptiu) sovint redueixen la qualitat en els actuals. La skill `claude-api` ho fa de manera sistemàtica amb `prompt-audit`.
+- [ ] **Audita els prompts a la recerca de restes quan canvien els models.** Les instruccions escrites per a models anteriors (prefills, rituals de «pensa pas a pas», format excessivament prescriptiu) sovint redueixen la qualitat en els actuals. Cada component de l'arnès codifica una suposició sobre allò que el model no pot fer; després d'un canvi de model, desactiva'ls d'un en un i mesura. La skill `claude-api` ho fa de manera sistemàtica amb `prompt-audit`.
 - [ ] **Informa de l'estalvi de l'índex a cada torn.** graft imprimeix els tokens estalviats per crida; suma'ls per torn i segueix el total de la sessió a la línia d'estat.
+- [ ] **Ancora cada bucle guiat per mètriques a alguna cosa que no pugui editar.** Un conjunt de veritat de referència reservat, un resultat de negoci real o una comprovació manual periòdica per part d'una persona. Un número que puja mentre el resultat real empitjora vol dir que el bucle ha après la mètrica, no la tasca.
 
 ### Seguretat i límits de confiança
 
@@ -540,6 +565,8 @@ def ask(question: str):
 | Execució per script | `claude -p "<prompt>" --output-format json --allowedTools "Read Grep"` |
 | Execució recurrent al núvol | `/schedule` |
 | Consultar periòdicament un estat extern lent | `/loop` |
+| Continuar treballant fins que es compleixi una condició | `/goal <condition>` |
+| Reobrir aquí l'última sessió | `claude --continue` (o `/resume`) |
 
 ### graft
 
@@ -581,6 +608,9 @@ def ask(question: str):
 
 - Documentació de Claude Code: https://code.claude.com/docs
 - Documentació de l'API de Claude: https://docs.anthropic.com
+- Objectius, bucles i rutines de Claude Code: https://code.claude.com/docs/en/goal, https://code.claude.com/docs/en/scheduled-tasks, https://code.claude.com/docs/en/routines
+- Anthropic Engineering, Effective harnesses for long-running agents (2025-11-26): https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents
+- Anthropic Engineering, Harness design for long-running application development (2026-03-24): https://www.anthropic.com/engineering/harness-design-long-running-apps
 - graft: https://www.npmjs.com/package/@nanonets/graft (la skill instal·lada a `~/.claude/skills/graft/SKILL.md` és la referència operativa)
 - CodeGraph: `codegraph --help` i les instruccions del servidor MCP `codegraph`
 - Regles de treball de Marc: `~/.claude/CLAUDE.md`
