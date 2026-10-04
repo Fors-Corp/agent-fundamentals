@@ -4,7 +4,7 @@ A checklist of the habits that separate casual use of Claude from professional u
 
 How to use it: tick what you already do consistently. Whatever stays unticked is your next skill to build. Items marked **House rule** come from Marc's working rules, which agents load from `~/.claude/CLAUDE.md`; they are restated in full in the House rules section so the team reads the same text the agents do. Everything else is general practice.
 
-Last revised 2026-10-02. Verified against Claude Code 2.1, graft 0.21.1, CodeGraph 1.6.1, Vercel CLI 62.2, and the Claude API model lineup of September 2026.
+Last revised 2026-10-04. Verified against Claude Code 2.1, graft 0.21.1, CodeGraph 1.6.1, Vercel CLI 62.2, and the Claude API model lineup of September 2026.
 
 ## Basics
 
@@ -41,7 +41,7 @@ The habits that matter from the first session. None of them need configuration.
 - [ ] **Treat everything the agent reads as data, not instructions.** Web pages, files, tool output, and emails can carry text aimed at the agent. A professional setup surfaces such text and asks you; it never acts on it.
 - [ ] **Keep the permission prompts for destructive actions.** Deleting, force-pushing, dropping tables, sending messages, paying. Pre-approve read-only and build commands instead, so the prompts you do see are the ones that matter.
 - [ ] **Never bypass permissions outside a sandbox.** `--dangerously-skip-permissions` is for isolated containers without internet access, not for your laptop.
-- [ ] **Keep a human on the irreversible step.** Publishing, merging to main, deploying, emailing. Automation can prepare everything up to that step.
+- [ ] **Keep a human on the irreversible step.** Publishing, merging to main, deploying, emailing. Automation can prepare everything up to that step. Define the approval request: what happened, what changed, why a human is needed, what approve and reject each lead to, and what happens on timeout.
 
 ## Intermediate
 
@@ -51,10 +51,13 @@ Shaping the environment so you stop repeating yourself and the agent stops repea
 
 - [ ] **Keep a CLAUDE.md in every repo you work in regularly.** Run `/init` to draft one, then edit it. It loads at the start of every session, which makes it the cheapest way to stop repeating instructions.
 - [ ] **Write imperatives about what is non-obvious.** Build and test commands, conventions a newcomer would miss, what must never be touched, how you want results reported. Do not describe what the code already shows; the agent can read code.
-- [ ] **Keep it short.** Every line costs tokens on every turn and dilutes the lines that matter. A few hundred lines is an upper bound. Move rarely needed material into skills that load on demand.
+- [ ] **Keep it short.** Every line costs tokens on every turn and dilutes the lines that matter. The docs target under 200 lines per file; `@imports` organise a file but do not reduce its context cost. Move rarely needed material into skills that load on demand.
 - [ ] **Use the three scopes deliberately.** `~/.claude/CLAUDE.md` for how you work everywhere, `<repo>/CLAUDE.md` for the project, and directory-level files for subsystems with their own rules.
-- [ ] **Promote the third correction.** The third time you correct the same behaviour in chat, it belongs in CLAUDE.md or a hook. The `claude-md-improver` skill reviews the file for stale or contradictory lines.
+- [ ] **Promote the third correction.** The third time you correct the same behaviour in chat, it belongs in CLAUDE.md or a hook. Delete rules that are stale or contradict each other: with two conflicting lines Claude may follow either, and `/doctor prompt-audit` finds them. The `claude-md-improver` skill also reviews the file for stale or contradictory lines.
 - [ ] **Let memory hold facts, not rules.** Claude Code's auto-memory records project facts and preferences across sessions. Prune entries that go stale; a wrong memory is worse than none.
+- [ ] **Run a fresh-session test on your repo.** Open a new session with no verbal context and ask five questions: what is this system, how is it organised, how do I run it, how do I verify it, where are we now. Every question it cannot answer from the repo alone is a gap in CLAUDE.md or the docs it points to.
+- [ ] **Keep personal project preferences in CLAUDE.local.md and gitignore it.** Sandbox URLs, preferred test data, local paths. It loads alongside the project CLAUDE.md and is treated the same way; team rules stay in the committed file, and managed policy loads above both.
+- [ ] **Keep auto-memory index entries to one line.** Only the first 200 lines or 25KB of MEMORY.md load per session; detail belongs in topic files Claude reads on demand. Do not let it store what the repo already shows.
 
 ### Context management
 
@@ -64,6 +67,7 @@ Shaping the environment so you stop repeating yourself and the agent stops repea
 - [ ] **Do not re-read a file you just edited.** The edit tool fails loudly if its target changed, so a re-read to "verify" is pure cost.
 - [ ] **Prefer text over screenshots.** In a browser, reading the page text or accessibility tree is cheaper and more precise than a screenshot. Screenshot only for layout.
 - [ ] **Prune connected MCP servers.** Each server's tool schemas can enter the context. Connect what the task needs and disable the rest; deferred tool loading helps, but fewer servers helps more.
+- [ ] **Hand off to a fresh session before the window is full.** For work that outlasts one session, write the progress file and the decisions taken, then start clean and read it first, rather than compacting again and again. Compaction keeps what was done and tends to drop why; a fresh session has only what you wrote down.
 
 ### Skills, hooks, and permissions
 
@@ -80,6 +84,8 @@ Shaping the environment so you stop repeating yourself and the agent stops repea
 - [ ] **Size the model to the task.** Haiku for mechanical sweeps, Sonnet for bounded implementation, the top model for judgment. State the model and the reason each time. (House rule)
 - [ ] **Launch independent agents in one message.** Serial spawning wastes wall-clock time. Agents that share no files can run together and finish together.
 - [ ] **Define reusable agents once.** Agent files in `.claude/agents/*.md` carry model, effort, and tools in their frontmatter, so the brief is the only thing that varies.
+- [ ] **Synthesise before you delegate.** Read the explorer's findings and write the implementer a precise spec: which of the three flows, which approach, what to return. "Based on your findings, fix it" hands the hardest thinking to a worker with the least context.
+- [ ] **Keep delegation one level deep unless you mean otherwise.** By default a subagent can spawn its own subagents three layers down, each with a fresh context you pay for and cannot see. Set `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1`, or omit `Agent` from a worker's `tools`, so help requests come back to the orchestrator.
 
 ### Model and effort
 
@@ -93,7 +99,8 @@ Shaping the environment so you stop repeating yourself and the agent stops repea
 - [ ] **Own tests while working, full suite once at the end.** Run only the test files that cover what you are changing; run the whole suite as the final gate, and again only if that run failed and you changed something. (House rule)
 - [ ] **Ask for proof in the final message.** Test output, a screenshot, a `curl` result. Verified and done are different states; make the agent say which one it reached.
 - [ ] **Run a second-opinion review.** `/code-review` on the diff for bugs, `/simplify` for cleanup, `/security-review` before merging anything that touches input, auth, or secrets.
-- [ ] **Separate the author from the reviewer.** Review in a fresh session or with a different agent. The one that wrote the code shares its blind spots.
+- [ ] **Write a definition of done the agent can execute, in order.** Static checks, then unit and integration tests, then one run of the real flow (start the app, hit the endpoint, show the output). Green mocked unit tests do not prove a cross-component change; a change is not done until the last level it needs has passed.
+- [ ] **Separate the author from the reviewer.** Review in a fresh session or with a different agent. The one that wrote the code shares its blind spots, and a subagent starts with a fresh context, which is why it makes a better reviewer than the session that wrote the code.
 
 ## Pro
 
@@ -109,6 +116,17 @@ Orchestration, automation, and governance. These items assume you already do eve
 - [ ] **Scope by budget, not by ambition.** Check the quota before launching, say what the run will cost, report spend against the ceiling at the end. One well-scoped workflow beats three thin ones. (House rule)
 - [ ] **Bring decisions back as evidence.** When a stage surfaces a decision for the owner, present the measurement that settles it and the options with consequences. Record the answer and the claims that failed verification. (House rule)
 - [ ] **Use the Workflow tool for deterministic orchestration.** A script with `pipeline`, `parallel`, and `agent` calls, phases, and schema-checked outputs. It runs only when the user opts in, because it can spend dozens of agents' worth of tokens.
+- [ ] **Agree a short contract before a long build.** Before code is written, the builder and the reviewer agree in text what "done" means for this chunk: scope, how each part is verified, and what is out of scope. The reviewer scores against the same list, so nothing is rejected for a foreseeable reason.
+- [ ] **Give the reviewer agent a rubric and calibrate it against your own judgment.** Fixed categories (correctness, evidence that checks ran, scope discipline, survives a restart, handoff readiness) and a verdict of accept, revise or block. Agents asked to grade work praise it; a reviewer may name a real issue and then talk itself into approving. Read its transcripts, find where its verdict diverged from yours, and tighten its prompt for that case.
+
+### Long-running and multi-session work
+
+- [ ] **Run setup as its own session before feature work.** The first session only makes the project runnable and verifiable: dependencies install, one test passes, an init script holds the start and verify commands, the work is broken into a feature list, and a clean baseline commit exists. Scaffolding and the first feature do not share a session.
+- [ ] **Keep a machine-readable feature list for multi-session work.** One JSON file in the repo where each item has the user-visible behaviour, the exact verification steps, a status (not started, in progress, blocked, passing) and an evidence field. The agent picks the next item from it; the file, not the chat, says what is done. JSON over Markdown: the model is less likely to rewrite it.
+- [ ] **Do not let the agent grade itself on the feature list.** Passing requires the recorded verification to have run, with the output attached. Tell it that status changes only after the check, and that deleting, weakening or rewriting tests or feature entries to hide unfinished work is unacceptable; where you can, put tests and eval scripts behind a `permissions.deny` rule so the working agent cannot edit the judge.
+- [ ] **Limit work in progress to one feature.** Write it into CLAUDE.md: finish and verify the current feature before starting the next, and do not refactor something else on the side. Given a broad brief, an agent tends to start several things at once and leave all of them half done.
+- [ ] **Keep a progress file the next session reads first.** A short repo file with the verified state, what changed, what is broken or unverified, the next best step and the exact start and verify commands. CLAUDE.md tells the agent to read it at the start and to update and commit it before it stops; nothing updates it automatically. A scheduled run that starts from a fresh clone needs the same file.
+- [ ] **Give the agent a fixed start-of-session routine.** In CLAUDE.md: `pwd`, read the progress file and the feature list, `git log --oneline -5`, run the init script, run a smoke check. If the baseline is already broken, fix that before any new work.
 
 ### Headless and scheduled runs
 
@@ -116,19 +134,26 @@ Orchestration, automation, and governance. These items assume you already do eve
 - [ ] **Schedule routines for recurring work.** Cloud scheduled agents (`/schedule`) handle nightly reports and dependency checks. `/loop` polls a slow external state within a session; it is not for one-off tasks.
 - [ ] **Give CI agents only the tools they need.** Allowlists, read-only tokens, and no push rights unless pushing is the job.
 - [ ] **Log every run.** Transcript, cost, outcome. Review the failures weekly; they are the cheapest source of CLAUDE.md and hook improvements.
+- [ ] **Choose between a goal and a loop by asking whether the work has an end.** A finish line (all tests in `test/auth` pass, the backlog is empty) is a `/goal`: a separate small model checks the condition after every turn and the session keeps working until it is met or judged impossible. Something you only need to keep watching (is CI green) is a `/loop` on an interval. Both are session-scoped.
+- [ ] **Write a goal the evaluator can read off the transcript.** One measurable end state, the command that proves it (`npm test` exits 0, `git status` is clean), the constraints that must hold on the way, and a bound such as "or stop after 20 turns". The evaluator does not run commands or read files; it judges only what the agent has surfaced, so make the agent print the proof.
+- [ ] **Cap every unattended run.** In print mode, `--max-turns` and `--max-budget-usd` stop a runaway session, and subagent spend counts toward the budget; in a `/goal`, put the turn or time bound in the condition; a recurring `/loop` expires after seven days by design. A loop with no cap turns one stuck test into an all-night bill.
+- [ ] **Match the schedule layer to how long the work must survive.** `/loop` needs the session open, runs at a one-minute minimum and expires after seven days; a desktop scheduled task runs while your machine is on, also down to one minute; a cloud routine (`/schedule`) runs with your machine off from a fresh clone, one hour minimum, triggered by a schedule, an API call, or a GitHub event.
 
 ### Hooks as gates
 
 - [ ] **Encode invariants as blocking hooks.** A PreToolUse hook that refuses destructive git, demands a fact statement before shell commands, or requires a test run before a commit cannot be talked around.
 - [ ] **Never disable a gate to get unblocked.** State the facts it asks for and retry the identical call. A gate you can switch off under pressure is not a gate. (House rule)
 - [ ] **Keep hooks fast and specific.** A slow hook taxes every tool call; a vague one trains everyone to bypass it.
+- [ ] **Use a Stop hook as a completion gate.** It runs when the agent declares it is finished; exit code 2 or `{"decision":"block","reason":...}` refuses the stop and the reason goes back to the agent as its next instruction. A PostToolUse hook cannot block, but its stderr on exit 2 reaches the agent after each edit. `/goal` is this mechanism with a model as the judge.
+- [ ] **Write hook, lint and test failures for the agent, with the fix included.** What failed, why the rule exists, and the exact next action ("Blocked: run `pnpm vitest run src/billing` and paste the output before committing") beats "denied". A blocking hook's `reason` or stderr is the agent's next input; a message that only says "violation" produces a blind retry.
 
 ### Measurement and evals
 
 - [ ] **Track cost per completed task, not per request.** `/cost` in the session, the app's usage view, and `graft stats` for index savings. A cheaper request that needs more turns is not cheaper.
 - [ ] **Build an eval before tuning a prompt, a skill, or CLAUDE.md.** Twenty to fifty real cases with a grading method. Measure before and after; without that, prompt changes are folklore.
-- [ ] **Audit prompts for cruft when models change.** Instructions written for older models (prefills, "think step by step" rituals, over-prescriptive formatting) often lower quality on current ones. The `claude-api` skill's `prompt-audit` does this systematically.
+- [ ] **Audit prompts for cruft when models change.** Instructions written for older models (prefills, "think step by step" rituals, over-prescriptive formatting) often lower quality on current ones. Every harness component encodes an assumption about what the model cannot do; after a model change, disable one at a time and measure. The `claude-api` skill's `prompt-audit` does this systematically.
 - [ ] **Report index savings every turn.** graft prints tokens saved per call; sum them per turn and track the session total on the statusline.
+- [ ] **Anchor every metric-driven loop to something it cannot edit.** A held-out ground-truth set, a real business outcome, or a periodic human spot-check. A number that rises while the real outcome gets worse means the loop learned the metric, not the task.
 
 ### Security and trust boundaries
 
@@ -540,6 +565,8 @@ def ask(question: str):
 | Scripted run | `claude -p "<prompt>" --output-format json --allowedTools "Read Grep"` |
 | Recurring cloud run | `/schedule` |
 | Poll a slow external state | `/loop` |
+| Keep working until a condition holds | `/goal <condition>` |
+| Reopen the last session here | `claude --continue` (or `/resume`) |
 
 ### graft
 
@@ -581,6 +608,9 @@ def ask(question: str):
 
 - Claude Code documentation: https://code.claude.com/docs
 - Claude API documentation: https://docs.anthropic.com
+- Claude Code goals, loops and routines: https://code.claude.com/docs/en/goal, https://code.claude.com/docs/en/scheduled-tasks, https://code.claude.com/docs/en/routines
+- Anthropic Engineering, Effective harnesses for long-running agents (2025-11-26): https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents
+- Anthropic Engineering, Harness design for long-running application development (2026-03-24): https://www.anthropic.com/engineering/harness-design-long-running-apps
 - graft: https://www.npmjs.com/package/@nanonets/graft (the installed skill at `~/.claude/skills/graft/SKILL.md` is the operational reference)
 - CodeGraph: `codegraph --help` and the `codegraph` MCP server instructions
 - Marc's working rules: `~/.claude/CLAUDE.md`

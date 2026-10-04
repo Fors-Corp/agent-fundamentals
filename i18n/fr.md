@@ -4,7 +4,7 @@ Une checklist des habitudes qui distinguent un usage occasionnel de Claude d'un 
 
 Mode d'emploi : cochez ce que vous faites déjà de façon constante. Ce qui reste décoché est votre prochaine compétence à construire. Les éléments marqués **Règle maison** viennent des règles de travail de Marc, que les agents chargent depuis `~/.claude/CLAUDE.md` ; elles sont reprises intégralement dans la section Règles maison, afin que l'équipe lise le même texte que les agents. Tout le reste relève des bonnes pratiques générales.
 
-Dernière révision le 2026-10-02. Vérifié avec Claude Code 2.1, graft 0.21.1, CodeGraph 1.6.1, Vercel CLI 62.2 et la gamme de modèles de l'API Claude de septembre 2026.
+Dernière révision le 2026-10-04. Vérifié avec Claude Code 2.1, graft 0.21.1, CodeGraph 1.6.1, Vercel CLI 62.2 et la gamme de modèles de l'API Claude de septembre 2026.
 
 ## Bases
 
@@ -41,7 +41,7 @@ Les habitudes qui comptent dès la première session. Aucune ne demande de confi
 - [ ] **Traitez tout ce que l'agent lit comme des données, pas comme des instructions.** Les pages web, fichiers, sorties d'outils et e-mails peuvent contenir du texte destiné à l'agent. Une configuration professionnelle fait remonter ce texte et vous demande votre avis ; elle n'agit jamais dessus.
 - [ ] **Gardez les demandes d'autorisation pour les actions destructrices.** Supprimer, faire un force-push, supprimer des tables, envoyer des messages, payer. Pré-approuvez plutôt les commandes de lecture seule et de build, pour que les demandes que vous voyez soient celles qui comptent.
 - [ ] **Ne contournez jamais les permissions hors d'un bac à sable.** `--dangerously-skip-permissions` est réservé aux conteneurs isolés sans accès à Internet, pas à votre ordinateur portable.
-- [ ] **Gardez un humain sur l'étape irréversible.** Publier, fusionner dans main, déployer, envoyer un e-mail. L'automatisation peut tout préparer jusqu'à cette étape.
+- [ ] **Gardez un humain sur l'étape irréversible.** Publier, fusionner dans main, déployer, envoyer un e-mail. L'automatisation peut tout préparer jusqu'à cette étape. Définissez la demande d'approbation : ce qui s'est passé, ce qui a changé, pourquoi un humain est nécessaire, ce que mènent à chaque fois l'approbation et le refus, et ce qui se passe en cas de délai dépassé.
 
 ## Intermédiaire
 
@@ -51,10 +51,13 @@ Façonner l'environnement pour que vous cessiez de vous répéter et que l'agent
 
 - [ ] **Gardez un CLAUDE.md dans chaque dépôt où vous travaillez régulièrement.** Lancez `/init` pour en rédiger un, puis retouchez-le. Il se charge au début de chaque session, ce qui en fait le moyen le moins coûteux d'arrêter de répéter vos instructions.
 - [ ] **Écrivez des impératifs sur ce qui n'est pas évident.** Commandes de build et de test, conventions qu'un nouvel arrivant manquerait, ce qui ne doit jamais être touché, la façon dont vous voulez que les résultats soient rapportés. Ne décrivez pas ce que le code montre déjà ; l'agent sait lire du code.
-- [ ] **Restez bref.** Chaque ligne coûte des tokens à chaque tour et dilue celles qui comptent. Quelques centaines de lignes constituent un plafond. Déplacez le contenu rarement utile dans des skills chargés à la demande.
+- [ ] **Restez bref.** Chaque ligne coûte des tokens à chaque tour et dilue celles qui comptent. La documentation vise moins de 200 lignes par fichier ; les `@imports` organisent un fichier mais ne réduisent pas son coût en contexte. Déplacez le contenu rarement utile dans des skills chargés à la demande.
 - [ ] **Utilisez les trois portées à bon escient.** `~/.claude/CLAUDE.md` pour votre façon de travailler partout, `<repo>/CLAUDE.md` pour le projet, et des fichiers par répertoire pour les sous-systèmes ayant leurs propres règles.
-- [ ] **Promouvez la troisième correction.** La troisième fois que vous corrigez le même comportement dans le chat, il a sa place dans CLAUDE.md ou dans un hook. Le skill `claude-md-improver` passe le fichier en revue pour repérer les lignes périmées ou contradictoires.
+- [ ] **Promouvez la troisième correction.** La troisième fois que vous corrigez le même comportement dans le chat, il a sa place dans CLAUDE.md ou dans un hook. Supprimez les règles périmées ou qui se contredisent : face à deux lignes contradictoires, Claude peut suivre l'une ou l'autre, et `/doctor prompt-audit` les repère. Le skill `claude-md-improver` passe aussi le fichier en revue pour repérer les lignes périmées ou contradictoires.
 - [ ] **Laissez la mémoire porter des faits, pas des règles.** La mémoire automatique de Claude Code enregistre des faits sur le projet et des préférences d'une session à l'autre. Élaguez les entrées devenues obsolètes ; une mémoire erronée est pire que pas de mémoire.
+- [ ] **Faites un test de session vierge sur votre dépôt.** Ouvrez une nouvelle session sans aucun contexte oral et posez cinq questions : qu'est-ce que ce système, comment est-il organisé, comment le lancer, comment le vérifier, où en est-on. Chaque question à laquelle il ne peut répondre à partir du seul dépôt révèle une lacune dans CLAUDE.md ou dans les docs vers lesquelles il pointe.
+- [ ] **Gardez vos préférences personnelles de projet dans CLAUDE.local.md et ajoutez-le à .gitignore.** URL de bac à sable, données de test préférées, chemins locaux. Il se charge avec le CLAUDE.md du projet et est traité de la même façon ; les règles d'équipe restent dans le fichier versionné, et la politique gérée se charge au-dessus des deux.
+- [ ] **Limitez les entrées de l'index de mémoire automatique à une ligne.** Seules les 200 premières lignes ou 25 Ko de MEMORY.md sont chargés par session ; le détail a sa place dans des fichiers thématiques que Claude lit à la demande. Ne le laissez pas stocker ce que le dépôt montre déjà.
 
 ### Gestion du contexte
 
@@ -64,6 +67,7 @@ Façonner l'environnement pour que vous cessiez de vous répéter et que l'agent
 - [ ] **Ne relisez pas un fichier que vous venez de modifier.** L'outil d'édition échoue bruyamment si sa cible a changé ; relire pour « vérifier » est donc un pur coût.
 - [ ] **Préférez le texte aux captures d'écran.** Dans un navigateur, lire le texte de la page ou l'arbre d'accessibilité est moins coûteux et plus précis qu'une capture. Ne faites une capture que pour la mise en page.
 - [ ] **Élaguez les serveurs MCP connectés.** Les schémas d'outils de chaque serveur peuvent entrer dans le contexte. Connectez ce dont la tâche a besoin et désactivez le reste ; le chargement différé des outils aide, mais moins de serveurs aide davantage.
+- [ ] **Passez le relais à une session vierge avant que la fenêtre soit pleine.** Pour un travail qui dépasse une session, écrivez le fichier de progression et les décisions prises, puis repartez de zéro en le lisant en premier, plutôt que de compacter encore et encore. La compaction conserve ce qui a été fait et tend à perdre le pourquoi ; une session vierge n'a que ce que vous avez écrit.
 
 ### Skills, hooks et permissions
 
@@ -80,6 +84,8 @@ Façonner l'environnement pour que vous cessiez de vous répéter et que l'agent
 - [ ] **Dimensionnez le modèle selon la tâche.** Haiku pour les balayages mécaniques, Sonnet pour l'implémentation bornée, le modèle le plus puissant pour le jugement. Indiquez à chaque fois le modèle et la raison. (House rule)
 - [ ] **Lancez les agents indépendants dans un seul message.** Lancer en série fait perdre du temps réel. Des agents qui ne partagent aucun fichier peuvent tourner ensemble et finir ensemble.
 - [ ] **Définissez une seule fois les agents réutilisables.** Les fichiers d'agent dans `.claude/agents/*.md` portent le modèle, l'effort et les outils dans leur frontmatter ; seul le brief varie alors.
+- [ ] **Faites la synthèse avant de déléguer.** Lisez les conclusions de l'explorateur et rédigez pour l'exécutant une spécification précise : lequel des trois flux, quelle approche, ce qu'il doit rendre. « D'après tes conclusions, corrige-le » confie la réflexion la plus difficile à un exécutant qui a le moins de contexte.
+- [ ] **Limitez la délégation à un niveau, sauf intention contraire.** Par défaut, un sous-agent peut lancer ses propres sous-agents sur trois niveaux, chacun avec un contexte neuf que vous payez sans le voir. Définissez `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1`, ou omettez `Agent` des `tools` d'un exécutant, pour que les demandes d'aide reviennent à l'orchestrateur.
 
 ### Modèle et effort
 
@@ -93,7 +99,8 @@ Façonner l'environnement pour que vous cessiez de vous répéter et que l'agent
 - [ ] **Vos propres tests pendant le travail, la suite complète une seule fois à la fin.** Lancez uniquement les fichiers de test qui couvrent ce que vous modifiez ; lancez toute la suite comme vérification finale, et une nouvelle fois seulement si elle a échoué et que vous avez changé quelque chose. (House rule)
 - [ ] **Demandez une preuve dans le message final.** Sortie de test, capture d'écran, résultat d'un `curl`. « Vérifié » et « terminé » sont deux états différents ; faites dire à l'agent lequel il a atteint.
 - [ ] **Faites une relecture pour un second avis.** `/code-review` sur le diff pour les bugs, `/simplify` pour le nettoyage, `/security-review` avant de fusionner tout ce qui touche aux entrées, à l'authentification ou aux secrets.
-- [ ] **Séparez l'auteur du relecteur.** Relisez dans une nouvelle session ou avec un autre agent. Celui qui a écrit le code partage ses angles morts.
+- [ ] **Rédigez une définition de « terminé » que l'agent peut exécuter, dans l'ordre.** Vérifications statiques, puis tests unitaires et d'intégration, puis une exécution du flux réel (lancer l'application, appeler le point d'accès, afficher la sortie). Des tests unitaires verts avec des mocks ne prouvent pas un changement entre composants ; un changement n'est pas terminé tant que le dernier niveau requis n'est pas passé.
+- [ ] **Séparez l'auteur du relecteur.** Relisez dans une nouvelle session ou avec un autre agent. Celui qui a écrit le code partage ses angles morts, et un sous-agent démarre avec un contexte neuf, ce qui en fait un meilleur relecteur que la session qui a écrit le code.
 
 ## Pro
 
@@ -109,6 +116,17 @@ Orchestration, automatisation et gouvernance. Ces éléments supposent que vous 
 - [ ] **Cadrez selon le budget, pas selon l'ambition.** Vérifiez le quota avant de lancer, dites ce que l'exécution coûtera, rapportez la dépense par rapport au plafond à la fin. Un workflow bien cadré vaut mieux que trois workflows minces. (House rule)
 - [ ] **Rapportez les décisions sous forme de preuves.** Quand une étape fait remonter une décision au propriétaire, présentez la mesure qui la tranche et les options avec leurs conséquences. Consignez la réponse et les affirmations qui n'ont pas résisté à la vérification. (House rule)
 - [ ] **Utilisez l'outil Workflow pour une orchestration déterministe.** Un script avec des appels `pipeline`, `parallel` et `agent`, des phases et des sorties validées par schéma. Il ne s'exécute que si l'utilisateur y consent, car il peut dépenser les tokens de dizaines d'agents.
+- [ ] **Convenez d'un court contrat avant une longue construction.** Avant d'écrire du code, le constructeur et le relecteur s'accordent par écrit sur ce que « terminé » signifie pour ce morceau : périmètre, façon de vérifier chaque partie, et ce qui est hors périmètre. Le relecteur note selon la même liste, de sorte que rien n'est rejeté pour une raison prévisible.
+- [ ] **Donnez une grille au relecteur et calibrez-le sur votre propre jugement.** Des catégories fixes (exactitude, preuve que les vérifications ont tourné, discipline de périmètre, survie à un redémarrage, prêt pour le relais) et un verdict : accepter, réviser ou bloquer. Les agents chargés de noter un travail le louent ; un relecteur peut nommer un vrai problème puis se convaincre d'approuver. Lisez ses transcriptions, repérez où son verdict a divergé du vôtre, et resserrez son prompt pour ce cas.
+
+### Travail de longue durée et multi-sessions
+
+- [ ] **Faites de la mise en place une session à part avant le travail sur les fonctionnalités.** La première session sert uniquement à rendre le projet exécutable et vérifiable : les dépendances s'installent, un test passe, un script d'initialisation contient les commandes de démarrage et de vérification, le travail est découpé en liste de fonctionnalités, et un commit de référence propre existe. L'échafaudage et la première fonctionnalité ne partagent pas une session.
+- [ ] **Tenez une liste de fonctionnalités lisible par machine pour le travail multi-sessions.** Un fichier JSON dans le dépôt où chaque entrée porte le comportement visible par l'utilisateur, les étapes de vérification exactes, un statut (non commencé, en cours, bloqué, réussi) et un champ de preuve. L'agent y choisit l'élément suivant ; c'est le fichier, pas le chat, qui dit ce qui est fait. JSON plutôt que Markdown : le modèle risque moins de le réécrire.
+- [ ] **Ne laissez pas l'agent s'auto-noter sur la liste de fonctionnalités.** Un statut « réussi » exige que la vérification enregistrée ait tourné, avec sa sortie jointe. Dites-lui que le statut ne change qu'après la vérification, et que supprimer, affaiblir ou réécrire des tests ou des entrées de la liste pour masquer un travail inachevé est inacceptable ; quand c'est possible, placez les tests et les scripts d'évaluation derrière une règle `permissions.deny` pour que l'agent au travail ne puisse pas modifier le juge.
+- [ ] **Limitez le travail en cours à une seule fonctionnalité.** Écrivez-le dans CLAUDE.md : terminer et vérifier la fonctionnalité en cours avant de commencer la suivante, et ne pas refactoriser autre chose en parallèle. Face à un brief large, un agent a tendance à entamer plusieurs choses à la fois et à les laisser toutes à moitié faites.
+- [ ] **Tenez un fichier de progression que la session suivante lit en premier.** Un court fichier du dépôt avec l'état vérifié, ce qui a changé, ce qui est cassé ou non vérifié, la meilleure prochaine étape et les commandes exactes de démarrage et de vérification. CLAUDE.md dit à l'agent de le lire au début, puis de le mettre à jour et de le committer avant de s'arrêter ; rien ne le met à jour automatiquement. Une exécution planifiée qui part d'un clone neuf a besoin du même fichier.
+- [ ] **Donnez à l'agent une routine fixe de début de session.** Dans CLAUDE.md : `pwd`, lire le fichier de progression et la liste de fonctionnalités, `git log --oneline -5`, lancer le script d'initialisation, lancer un test de fumée. Si la base de départ est déjà cassée, corrigez-la avant tout nouveau travail.
 
 ### Exécutions headless et planifiées
 
@@ -116,19 +134,26 @@ Orchestration, automatisation et gouvernance. Ces éléments supposent que vous 
 - [ ] **Planifiez des routines pour le travail récurrent.** Les agents planifiés dans le cloud (`/schedule`) gèrent les rapports de nuit et les contrôles de dépendances. `/loop` interroge un état externe lent au sein d'une session ; il n'est pas fait pour les tâches ponctuelles.
 - [ ] **Ne donnez aux agents de CI que les outils dont ils ont besoin.** Listes d'autorisations, tokens en lecture seule, et aucun droit de push sauf si pousser est le travail.
 - [ ] **Journalisez chaque exécution.** Transcription, coût, résultat. Passez les échecs en revue chaque semaine ; c'est la source la moins chère d'améliorations pour CLAUDE.md et les hooks.
+- [ ] **Choisissez entre un objectif et une boucle en vous demandant si le travail a une fin.** Une ligne d'arrivée (tous les tests de `test/auth` passent, le backlog est vide) relève de `/goal` : un petit modèle distinct vérifie la condition après chaque tour et la session continue jusqu'à ce qu'elle soit remplie ou jugée impossible. Ce que vous voulez seulement surveiller (la CI est-elle verte) relève de `/loop` à intervalle régulier. Les deux sont limités à la session.
+- [ ] **Rédigez un objectif que l'évaluateur peut lire dans la transcription.** Un état final mesurable, la commande qui le prouve (`npm test` se termine à 0, `git status` est propre), les contraintes à respecter en chemin, et une borne du type « ou arrête-toi après 20 tours ». L'évaluateur n'exécute pas de commandes et ne lit pas de fichiers ; il juge uniquement ce que l'agent a fait apparaître, donc faites afficher la preuve par l'agent.
+- [ ] **Plafonnez chaque exécution sans surveillance.** En mode print, `--max-turns` et `--max-budget-usd` arrêtent une session qui s'emballe, et la dépense des sous-agents compte dans le budget ; dans un `/goal`, mettez la borne de tours ou de durée dans la condition ; un `/loop` récurrent expire au bout de sept jours par conception. Une boucle sans plafond transforme un test bloqué en facture de toute une nuit.
+- [ ] **Adaptez la couche de planification à la durée de vie requise du travail.** `/loop` exige que la session reste ouverte, s'exécute au minimum toutes les minutes et expire au bout de sept jours ; une tâche planifiée de bureau tourne tant que votre machine est allumée, elle aussi jusqu'à la minute ; une routine cloud (`/schedule`) tourne machine éteinte à partir d'un clone neuf, au minimum toutes les heures, déclenchée par un horaire, un appel d'API ou un événement GitHub.
 
 ### Les hooks comme barrières
 
 - [ ] **Encodez les invariants sous forme de hooks bloquants.** Un hook PreToolUse qui refuse les opérations git destructrices, exige un énoncé des faits avant les commandes shell ou impose une exécution des tests avant un commit ne peut pas être contourné par la discussion.
 - [ ] **Ne désactivez jamais une barrière pour vous débloquer.** Énoncez les faits demandés et relancez l'appel identique. Une barrière que l'on peut couper sous pression n'en est pas une. (House rule)
 - [ ] **Gardez des hooks rapides et précis.** Un hook lent taxe chaque appel d'outil ; un hook vague apprend à tout le monde à le contourner.
+- [ ] **Utilisez un hook Stop comme barrière d'achèvement.** Il s'exécute quand l'agent déclare avoir terminé ; le code de sortie 2 ou `{"decision":"block","reason":...}` refuse l'arrêt et la raison revient à l'agent comme sa prochaine instruction. Un hook PostToolUse ne peut pas bloquer, mais son stderr, avec le code de sortie 2, parvient à l'agent après chaque modification. `/goal` est ce mécanisme avec un modèle comme juge.
+- [ ] **Rédigez les échecs de hooks, de lint et de tests pour l'agent, correctif inclus.** Ce qui a échoué, pourquoi la règle existe et la prochaine action exacte (« Bloqué : lancez `pnpm vitest run src/billing` et collez la sortie avant de committer ») valent mieux qu'un « refusé ». La `reason` ou le stderr d'un hook bloquant est la prochaine entrée de l'agent ; un message qui dit seulement « violation » produit une nouvelle tentative à l'aveugle.
 
 ### Mesure et évaluations
 
 - [ ] **Suivez le coût par tâche terminée, pas par requête.** `/cost` dans la session, la vue d'utilisation de l'application, et `graft stats` pour les économies de l'index. Une requête moins chère qui demande plus de tours n'est pas moins chère.
 - [ ] **Construisez une évaluation avant d'ajuster un prompt, un skill ou CLAUDE.md.** Vingt à cinquante cas réels avec une méthode de notation. Mesurez avant et après ; sans cela, les changements de prompt relèvent du folklore.
-- [ ] **Auditez les prompts pour en retirer le superflu quand les modèles changent.** Les instructions écrites pour d'anciens modèles (prefills, rituels « réfléchis étape par étape », mise en forme trop prescriptive) dégradent souvent la qualité sur les modèles actuels. Le skill `claude-api` propose `prompt-audit`, qui le fait de manière systématique.
+- [ ] **Auditez les prompts pour en retirer le superflu quand les modèles changent.** Les instructions écrites pour d'anciens modèles (prefills, rituels « réfléchis étape par étape », mise en forme trop prescriptive) dégradent souvent la qualité sur les modèles actuels. Chaque composant du harnais encode une hypothèse sur ce que le modèle ne sait pas faire ; après un changement de modèle, désactivez-les un par un et mesurez. Le skill `claude-api` propose `prompt-audit`, qui le fait de manière systématique.
 - [ ] **Rapportez les économies d'index à chaque tour.** graft affiche les tokens économisés par appel ; additionnez-les par tour et suivez le total de session dans la barre d'état.
+- [ ] **Ancrez chaque boucle pilotée par une métrique à quelque chose qu'elle ne peut pas modifier.** Un jeu de référence mis de côté, un résultat métier réel, ou un contrôle humain périodique par sondage. Un chiffre qui monte pendant que le résultat réel se dégrade signifie que la boucle a appris la métrique, pas la tâche.
 
 ### Sécurité et frontières de confiance
 
@@ -540,6 +565,8 @@ def ask(question: str):
 | Exécution scriptée | `claude -p "<prompt>" --output-format json --allowedTools "Read Grep"` |
 | Exécution récurrente dans le cloud | `/schedule` |
 | Interroger un état externe lent | `/loop` |
+| Continuer jusqu'à ce qu'une condition soit remplie | `/goal <condition>` |
+| Rouvrir la dernière session ici | `claude --continue` (ou `/resume`) |
 
 ### graft
 
@@ -581,6 +608,9 @@ def ask(question: str):
 
 - Documentation de Claude Code : https://code.claude.com/docs
 - Documentation de l'API Claude : https://docs.anthropic.com
+- Objectifs, boucles et routines de Claude Code : https://code.claude.com/docs/en/goal, https://code.claude.com/docs/en/scheduled-tasks, https://code.claude.com/docs/en/routines
+- Anthropic Engineering, Effective harnesses for long-running agents (2025-11-26) : https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents
+- Anthropic Engineering, Harness design for long-running application development (2026-03-24) : https://www.anthropic.com/engineering/harness-design-long-running-apps
 - graft : https://www.npmjs.com/package/@nanonets/graft (le skill installé à l'emplacement `~/.claude/skills/graft/SKILL.md` est la référence opérationnelle)
 - CodeGraph : `codegraph --help` et les instructions du serveur MCP `codegraph`
 - Règles de travail de Marc : `~/.claude/CLAUDE.md`
