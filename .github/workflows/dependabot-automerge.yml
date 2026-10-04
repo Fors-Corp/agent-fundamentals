@@ -1,0 +1,36 @@
+name: Dependabot auto-merge
+
+# Same standing rule as the other Fors-Corp repos: a Dependabot PR is merged as
+# soon as the required checks on `main` are green. This workflow never bypasses
+# a check; it only arms GitHub's native auto-merge. Nothing from the PR branch is
+# checked out or executed (pull_request_target runs the base branch's copy of
+# this file), and every step is a GitHub API call.
+#
+# One carve-out: a MAJOR bump of a GitHub Action is left for a human, because a
+# renamed input is ignored rather than rejected and no status check can catch it.
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions: {}
+
+jobs:
+  arm:
+    name: Arm auto-merge on a Dependabot PR
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.event.pull_request.base.ref == 'main' && github.repository == 'Fors-Corp/agent-fundamentals'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # required by gh pr merge
+      pull-requests: write
+    steps:
+      - name: Read Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Arm native auto-merge
+        if: ${{ steps.metadata.outcome == 'success' && steps.metadata.outputs.update-type != 'version-update:semver-major' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge --squash --auto "$PR_URL"

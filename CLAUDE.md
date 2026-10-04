@@ -6,7 +6,7 @@ Static, multilingual checklist site generated from Markdown. No runtime dependen
 - Check every translation against the English structure: `npm run check` (one language: `node check-translation.mjs <lang>`)
 - Build all pages into `agent-fundamentals/`: `npm run build`
 - Preview locally: the `checklist` entry in `.claude/launch.json` serves the folder on port 8765
-- Deploy: push to `main`; Vercel runs `node build.mjs` and publishes `agent-fundamentals/`
+- Deploy: open a pull request from a branch (`main` is protected: squash-merge only, linear history, required checks `check-and-build`, `Analyze (actions)`, `Analyze (javascript-typescript)`); merging to `main` makes Vercel run `node build.mjs` and publish `agent-fundamentals/`. Dependabot PRs for the pinned Action SHAs auto-merge once green, except major Action bumps.
 
 ## Structure
 - `claude-agent-fundamentals.md` is the English source of truth. `i18n/<lang>.md` are translations with the same structure.
