@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 - Support · 1,99 € link in the page footer (translated in all seven languages) and a README badge.
+- Cloudflare Workers static-assets config (`wrangler.jsonc`); the build writes `_headers` from `vercel.json` so both hosts send the same security headers.
+
+### Changed
+- `vercel.json` declares `Strict-Transport-Security` explicitly (the value Vercel already sent) so Cloudflare sends it too.
 
 ## [1.2.0] - 2026-10-04
 

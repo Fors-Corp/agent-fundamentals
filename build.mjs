@@ -645,6 +645,12 @@ for (const [from, to] of Object.entries(ICONS)) {
   if (!existsSync(p)) throw new Error(`missing icon asset: assets/${from} (run scripts/make-icons.sh)`);
   copyFileSync(p, join(SITE_DIR, to));
 }
+// Cloudflare reads response headers from _headers in the asset directory; derive it from vercel.json so both hosts send the same ones.
+const headerRules = JSON.parse(readFileSync(join(here, "vercel.json"), "utf8")).headers ?? [];
+writeFileSync(join(SITE_DIR, "_headers"), headerRules.map((rule) => {
+  if (rule.source !== "/(.*)") throw new Error(`vercel.json header source ${rule.source} has no _headers mapping`);
+  return ["/*", ...rule.headers.map((h) => `  ${h.key}: ${h.value}`)].join("\n") + "\n";
+}).join(""));
 writeFileSync(join(SITE_DIR, "manifest.webmanifest"), JSON.stringify({
   name: "Agent Fundamentals",
   short_name: "Agent Fundamentals",
