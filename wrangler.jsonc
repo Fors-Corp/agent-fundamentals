@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "agent-fundamentals",
+  "compatibility_date": "2026-10-26",
+  "workers_dev": true,
+  "assets": {
+    "directory": "./agent-fundamentals",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "none"
+  }
+}

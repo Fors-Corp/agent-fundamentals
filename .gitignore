@@ -3,6 +3,7 @@ agent-fundamentals/
 claude-agent-fundamentals.html
 # local tooling and caches
 .vercel/
+.wrangler/
 .env*
 graft/
 .ignore
